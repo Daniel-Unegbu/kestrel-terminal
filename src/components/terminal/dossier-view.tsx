@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AlertTriangle, ExternalLink, Globe2, Landmark, ShieldCheck } from "lucide-react";
 import type { InstitutionalDossier, Severity } from "@/lib/dossier";
-import { SEGMENTS } from "@/lib/dossier";
+import { SEGMENTS, PROVIDER_LABEL } from "@/lib/dossier";
 import { AudioBrief } from "./audio-brief";
 import { SourceBadge, SourceBadges } from "./source-badge";
 
@@ -240,7 +240,7 @@ export function DossierView({ dossier, cacheKey }: { dossier: InstitutionalDossi
                   {c.sourceUrl && (
                     <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-gold">
                       <ExternalLink className="size-3" /> {c.sourceTitle}
-                      <span className="num">· {c.searchProvider}</span>
+                      <span className="num">· {PROVIDER_LABEL[c.searchProvider]}</span>
                     </a>
                   )}
                 </div>
@@ -280,7 +280,7 @@ function Legend({ color, label }: { color: string; label: string }) {
 }
 
 export function DossierSkeleton({ stage }: { stage: number }) {
-  const stages = ["Retrieving live sources · Tavily", "Enriching · SerpAPI fallback", "Synthesizing dossier · Gemini", "Citing & saving"];
+  const stages = ["Research Agent · retrieving sources", "Search Agent · fallback enrichment", "Orchestration core · synthesizing dossier", "Citing & saving"];
   return (
     <div className="space-y-4">
       <div className="panel p-5">

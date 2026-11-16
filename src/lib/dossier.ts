@@ -18,7 +18,14 @@ export type RadarCategory =
   | "FX & Corridor Risk"
   | "ESG / Transition Finance";
 export type Severity = "INFO" | "WATCH" | "CRITICAL";
-export type SearchProvider = "TAVILY" | "SERPAPI" | "REFERENCE";
+export type SearchProvider = "RESEARCH" | "SEARCH" | "REFERENCE";
+
+/** User-facing provider labels — never expose upstream vendor names in the UI. */
+export const PROVIDER_LABEL: Record<SearchProvider, string> = {
+  RESEARCH: "Research Agent",
+  SEARCH: "Search Agent",
+  REFERENCE: "Reference",
+};
 
 export interface DossierSource {
   title: string;

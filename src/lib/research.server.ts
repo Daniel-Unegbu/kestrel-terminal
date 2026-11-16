@@ -21,7 +21,7 @@ export async function tavilySearch(query: string): Promise<RetrievedDoc[]> {
   const json = (await res.json()) as { results?: Array<{ title?: string; url?: string; content?: string }> };
   return (json.results ?? [])
     .filter((r) => r.url)
-    .map((r) => ({ title: r.title ?? r.url!, url: r.url!, snippet: (r.content ?? "").slice(0, 900), provider: "TAVILY" as const }));
+    .map((r) => ({ title: r.title ?? r.url!, url: r.url!, snippet: (r.content ?? "").slice(0, 900), provider: "RESEARCH" as const }));
 }
 
 export async function serpSearch(query: string): Promise<RetrievedDoc[]> {
@@ -46,7 +46,7 @@ export async function serpSearch(query: string): Promise<RetrievedDoc[]> {
       title: r.title ?? r.link!,
       url: r.link!,
       snippet: (r.snippet ?? r.source?.name ?? "").slice(0, 600),
-      provider: "SERPAPI" as const,
+      provider: "SEARCH" as const,
     }));
 }
 

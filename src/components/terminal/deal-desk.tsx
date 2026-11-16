@@ -32,6 +32,7 @@ export function DealDeskDock() {
   const recorder = useRef<MediaRecorder | null>(null);
   const chunks = useRef<Blob[]>([]);
   const audio = useRef<HTMLAudioElement | null>(null);
+  const stopRequested = useRef(false);
 
   const speak = useCallback(
     async (text: string) => {
@@ -77,6 +78,7 @@ export function DealDeskDock() {
   const startRecording = useCallback(async () => {
     if (phase === "recording") return;
     setError(null);
+    stopRequested.current = false;
     audio.current?.pause();
     window.speechSynthesis?.cancel();
     try {
@@ -105,27 +107,32 @@ export function DealDeskDock() {
       recorder.current = rec;
       rec.start();
       setPhase("recording");
+      // The key/pointer may have been released while the mic was still opening.
+      if (stopRequested.current) {
+        stopRequested.current = false;
+        rec.stop();
+      }
     } catch {
       setError("Microphone unavailable — type your question instead.");
     }
   }, [phase, submit, transcribe]);
 
   const stopRecording = useCallback(() => {
+    stopRequested.current = true;
     if (recorder.current?.state === "recording") recorder.current.stop();
   }, []);
 
-  // Hold Space to talk (ignored while typing in a field).
+  // Hold Space to talk — only while the Deal Desk is open, so Space still scrolls the page.
   useEffect(() => {
     const isTyping = (t: EventTarget | null) =>
       t instanceof HTMLElement && (t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName));
     const down = (e: KeyboardEvent) => {
-      if (e.code !== "Space" || e.repeat || isTyping(e.target) || document.querySelector("[role=dialog]")) return;
+      if (!deskOpen || e.code !== "Space" || e.repeat || isTyping(e.target) || document.querySelector("[role=dialog]")) return;
       e.preventDefault();
-      setDeskOpen(true);
       void startRecording();
     };
     const up = (e: KeyboardEvent) => {
-      if (e.code !== "Space" || isTyping(e.target)) return;
+      if (!deskOpen || e.code !== "Space" || isTyping(e.target)) return;
       stopRecording();
     };
     window.addEventListener("keydown", down);
@@ -134,7 +141,7 @@ export function DealDeskDock() {
       window.removeEventListener("keydown", down);
       window.removeEventListener("keyup", up);
     };
-  }, [setDeskOpen, startRecording, stopRecording]);
+  }, [deskOpen, startRecording, stopRecording]);
 
   const busy = phase === "transcribing" || phase === "thinking";
 
@@ -173,7 +180,7 @@ export function DealDeskDock() {
               {busy && (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Loader2 className="size-3.5 animate-spin text-gold" />
-                  <span className="num">{phase === "transcribing" ? "Transcribing · Deepgram Nova" : "Reasoning over dossier · Gemini"}</span>
+                  <span className="num">{phase === "transcribing" ? "Transcribing · Voice Agent" : "Reasoning over dossier · Research Agent"}</span>
                 </div>
               )}
               {answer && (

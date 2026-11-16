@@ -9,7 +9,7 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
   const tts = useServerFn(synthesizeSpeech);
   const [state, setState] = useState<"idle" | "loading" | "playing" | "paused">("idle");
   const [progress, setProgress] = useState(0);
-  const [engine, setEngine] = useState<"deepgram" | "browser" | null>(null);
+  const [engine, setEngine] = useState<"neural" | "browser" | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const words = useMemo(() => script.split(/\s+/).filter(Boolean), [script]);
 
@@ -48,12 +48,12 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
 
   const start = async () => {
     if (state === "playing") {
-      if (engine === "deepgram") audioRef.current?.pause();
+      if (engine === "neural") audioRef.current?.pause();
       else window.speechSynthesis.pause();
       return setState("paused");
     }
     if (state === "paused") {
-      if (engine === "deepgram") await audioRef.current?.play();
+      if (engine === "neural") await audioRef.current?.play();
       else window.speechSynthesis.resume();
       return setState("playing");
     }
@@ -74,7 +74,7 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
       setState("idle");
       setProgress(1);
     };
-    setEngine("deepgram");
+    setEngine("neural");
     try {
       await audio.play();
       setState("playing");
@@ -105,7 +105,7 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
         <div className="min-w-0 flex-1">
           <div className="text-sm font-medium">Play 60s RM Audio Brief</div>
           <div className="eyebrow !text-[10px] mt-0.5">
-            {engine === "browser" ? "Browser voice fallback" : "Deepgram Aura · executive voice"}
+            {engine === "browser" ? "Browser voice fallback" : "Voice Agent · executive voice"}
           </div>
         </div>
         <div className="flex h-8 items-center gap-[3px]" aria-hidden="true">

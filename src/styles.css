@@ -225,6 +225,35 @@
 }
 
 @media print {
-  body { background: white; color: black; }
+  html, body {
+    background: #fff !important;
+    background-image: none !important;
+    color: #111 !important;
+  }
   .no-print { display: none !important; }
+  /* Print only the open term-sheet dialog, not the terminal chrome behind it. */
+  body > *:not(:has([role="dialog"])) { display: none !important; }
+  [data-slot="dialog-overlay"] { display: none !important; }
+  [role="dialog"] {
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    color: #111 !important;
+    padding: 0 !important;
+  }
+  [role="dialog"] * {
+    color: #111 !important;
+    background: transparent !important;
+    border-color: #d4d4d4 !important;
+    box-shadow: none !important;
+  }
+  [role="dialog"] .no-print { display: none !important; }
+  #term-sheet { page-break-inside: avoid; }
 }

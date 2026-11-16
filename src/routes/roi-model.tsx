@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { CartesianGrid, Line, LineChart, ReferenceDot, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { FileText, Printer, RotateCcw } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
@@ -37,6 +38,7 @@ function RoiModel() {
   const [inputs, setInputs] = useState<RoiInputs>(ROI_DEFAULTS);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [saved, setSaved] = useState<{ id: string; createdAt: string } | null>(null);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "draft">("idle");
   const save = useServerFn(savePilotSimulation);
   const out = useMemo(() => computeRoi(inputs), [inputs]);
   const curve = useMemo(() => sensitivityCurve(inputs), [inputs]);
@@ -44,8 +46,15 @@ function RoiModel() {
   const openSheet = async () => {
     setSheetOpen(true);
     setSaved(null);
+    setSaveState("saving");
     const res = await save({ data: inputs }).catch(() => null);
-    if (res?.ok) setSaved({ id: res.id, createdAt: res.createdAt });
+    if (res?.ok) {
+      setSaved({ id: res.id, createdAt: res.createdAt });
+      setSaveState("saved");
+      return;
+    }
+    setSaveState("draft");
+    toast.error("Term sheet ready, but this scenario couldn't be saved.");
   };
 
   return (
@@ -165,7 +174,13 @@ function RoiModel() {
                 <div className="text-xs text-muted-foreground">Prepared for FAB Innovation committee review</div>
               </div>
               <div className="num text-right text-[11px] text-muted-foreground">
-                {saved ? <>Ref {saved.id.slice(0, 8).toUpperCase()}<br />{new Date(saved.createdAt).toLocaleDateString("en-GB")}</> : "Saving…"}
+                {saved ? (
+                  <>Ref {saved.id.slice(0, 8).toUpperCase()}<br />{new Date(saved.createdAt).toLocaleDateString("en-GB")}</>
+                ) : saveState === "saving" ? (
+                  "Saving…"
+                ) : (
+                  <>Draft<br />{new Date().toLocaleDateString("en-GB")}</>
+                )}
               </div>
             </div>
             <Section title="Scope">
@@ -200,7 +215,7 @@ function RoiModel() {
               source-cited, and ≥ {out.breakEvenMandates} attributable incremental mandates in pipeline.
             </Section>
             <Section title="Governance">
-              UAE data residency, no external model training, RBAC, single-virtual-key secret isolation and immutable audit logs
+              UAE data residency, no external model training, RBAC, single ephemeral session token and immutable audit logs
               for credit committee review.
             </Section>
           </div>

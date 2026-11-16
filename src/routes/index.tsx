@@ -38,7 +38,7 @@ const NODES = [
     ring: "border-azure/40",
     eyebrow: "01 · Ingestion",
     title: "Live multi-source retrieval",
-    body: "Tavily advanced search with SerpAPI Google News fallback for niche regional subsidiaries.",
+    body: "Advanced research retrieval with an independent search fallback for niche regional subsidiaries.",
   },
   {
     icon: Sparkles,
@@ -46,7 +46,7 @@ const NODES = [
     ring: "border-gold/50",
     eyebrow: "02 · Synthesis",
     title: "Sovereign gateway synthesis",
-    body: "Gemini through a single governed gateway — swappable to Azure OpenAI in UAE North.",
+    body: "One governed orchestration core over FAB-approved models — repointable to Azure OpenAI in UAE North.",
   },
   {
     icon: AudioLines,
@@ -54,7 +54,7 @@ const NODES = [
     ring: "border-emerald/40",
     eyebrow: "03 · Delivery",
     title: "Cited RM dossier + audio brief",
-    body: "Six research modules, source-level citations and a 60-second Deepgram voice brief.",
+    body: "Six research modules, source-level citations and a 60-second voice brief.",
   },
 ];
 

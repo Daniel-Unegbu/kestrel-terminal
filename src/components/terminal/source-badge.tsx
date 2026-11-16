@@ -1,4 +1,5 @@
 import type { DossierSource } from "@/lib/dossier";
+import { PROVIDER_LABEL } from "@/lib/dossier";
 
 export function SourceBadges({ refs, sources }: { refs?: number[] | undefined; sources: DossierSource[] }) {
   if (!refs?.length) return null;
@@ -15,9 +16,9 @@ export function SourceBadges({ refs, sources }: { refs?: number[] | undefined; s
 
 export function SourceBadge({ index, source }: { index: number; source: DossierSource }) {
   const tone =
-    source.provider === "TAVILY"
+    source.provider === "RESEARCH"
       ? "border-emerald/40 text-emerald hover:bg-emerald/10"
-      : source.provider === "SERPAPI"
+      : source.provider === "SEARCH"
         ? "border-azure/40 text-azure hover:bg-azure/10"
         : "border-hairline-strong text-muted-foreground hover:text-foreground";
   return (
@@ -25,7 +26,7 @@ export function SourceBadge({ index, source }: { index: number; source: DossierS
       href={source.url}
       target="_blank"
       rel="noreferrer"
-      title={`${source.title} — ${source.provider}`}
+      title={`${source.title} — ${PROVIDER_LABEL[source.provider]}`}
       className={`num inline-flex items-center rounded border px-1.5 py-px text-[10px] transition-colors ${tone}`}
     >
       [Source {index + 1}]

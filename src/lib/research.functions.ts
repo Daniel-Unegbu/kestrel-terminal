@@ -2,11 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
-import { slugify, type InstitutionalDossier } from "./dossier";
+import { slugify, type InstitutionalDossier, type SearchProvider } from "./dossier";
 
 function publicClient() {
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
-  return createClient<Database>(process.env["SUPABASE_URL"]!, key, {
+  const url = process.env["SUPABASE_URL"];
+  const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
+  if (!url || !key) throw new Error("Supabase environment variables are not configured");
+  return createClient<Database>(url, key, {
     auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
     global: {
       fetch: (input, init) => {
@@ -68,27 +70,48 @@ export const runResearch = createServerFn({ method: "POST" })
   });
 
 export const listRecentDossiers = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await publicClient()
-    .from("institutional_dossiers")
-    .select("entity_slug, entity_name, segment, updated_at")
-    .eq("is_preset", false)
-    .order("updated_at", { ascending: false })
-    .limit(12);
-  if (error) {
-    console.error(error);
+  try {
+    const { data, error } = await publicClient()
+      .from("institutional_dossiers")
+      .select("entity_slug, entity_name, segment, updated_at")
+      .eq("is_preset", false)
+      .order("updated_at", { ascending: false })
+      .limit(12);
+    if (error) {
+      console.error(error);
+      return [];
+    }
+    return data ?? [];
+  } catch (err) {
+    console.error("Recent dossiers unavailable", err);
     return [];
   }
-  return data ?? [];
 });
 
 export const getDossier = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ slug: z.string().min(1).max(100) }).parse(d))
   .handler(async ({ data }) => {
-    const { data: row, error } = await publicClient()
-      .from("institutional_dossiers")
-      .select("id, dossier_payload")
-      .eq("entity_slug", data.slug)
-      .maybeSingle();
-    if (error || !row) return null;
-    return { ...(row.dossier_payload as unknown as InstitutionalDossier), id: row.id };
+    try {
+      const { data: row, error } = await publicClient()
+        .from("institutional_dossiers")
+        .select("id, dossier_payload")
+        .eq("entity_slug", data.slug)
+        .maybeSingle();
+      if (error || !row) return null;
+      const payload = row.dossier_payload as unknown as InstitutionalDossier;
+      // Dossiers saved before the provider rename stored vendor names; normalise on read.
+      const provider = (p: string) => (p === "TAVILY" ? "RESEARCH" : p === "SERPAPI" ? "SEARCH" : p) as SearchProvider;
+      return {
+        ...payload,
+        id: row.id,
+        sources: (payload.sources ?? []).map((s) => ({ ...s, provider: provider(s.provider) })),
+        complianceAndRiskRadar: (payload.complianceAndRiskRadar ?? []).map((c) => ({
+          ...c,
+          searchProvider: provider(c.searchProvider),
+        })),
+      };
+    } catch (err) {
+      console.error("Dossier lookup unavailable", err);
+      return null;
+    }
   });

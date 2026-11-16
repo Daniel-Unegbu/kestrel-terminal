@@ -9,10 +9,10 @@ export const Route = createFileRoute("/architecture")({
       { title: "Sovereign Azure & Governance Blueprint — Kestrel Terminal" },
       {
         name: "description",
-        content: "Dual-container deployment in Azure UAE North behind a single-virtual-key AI gateway, with CBUAE & ADGM compliance controls and a 90-day proof-of-value roadmap.",
+        content: "Two-container deployment in Azure UAE North behind a single governed orchestration core, with CBUAE & ADGM compliance controls and a 90-day proof-of-value roadmap.",
       },
       { property: "og:title", content: "Sovereign Azure & Governance Blueprint — Kestrel Terminal" },
-      { property: "og:description", content: "100% UAE data residency, zero secret sprawl, auditable for credit committee." },
+      { property: "og:description", content: "100% UAE data residency, one ephemeral session token, auditable for credit committee." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -22,22 +22,32 @@ export const Route = createFileRoute("/architecture")({
 
 const PHASES = {
   mvp: {
-    label: "Phase 1 · Rapid MVP",
-    note: "App server routes call search & voice providers directly; the gateway governs model calls only.",
-    app: ["Gateway virtual key", "Tavily key", "SerpAPI key", "Deepgram key"],
-    gateway: ["Model provider: Gemini"],
+    label: "Phase 1 · Rapid prototype",
+    note: "The application tier calls research and voice connectors directly while the orchestration core governs model inference only — the fastest path to a working pilot.",
+    app: ["Internal Database · session & dossier cache", "Microsoft Entra ID (SSO) · RBAC", "Research, Search & Voice connectors"],
+    core: ["Ephemeral session token", "Model routing · FAB-approved endpoint"],
   },
   enterprise: {
     label: "Phase 2 · Zero-secret enterprise",
-    note: "All upstream credentials live inside the gateway. The app container holds one virtual key — swap Gemini for Azure OpenAI with a single config change.",
-    app: ["Gateway virtual key"],
-    gateway: ["Model provider: Gemini ⇄ Azure OpenAI", "MCP gateway: Tavily + SerpAPI", "Audio relay: Deepgram Aura / Nova"],
+    note: "Every upstream credential is consolidated inside the orchestration core. The application container holds a single ephemeral session token, and the model provider can be repointed to FAB's private Azure OpenAI endpoint with one configuration change — no application code changes.",
+    app: ["Internal Database · session & dossier cache", "Microsoft Entra ID (SSO) · RBAC", "M365 triggers · Outlook & Teams sync"],
+    core: [
+      "Single ephemeral session token · zero key sprawl",
+      "Research, Search & Voice agents · ingestion & synthesis",
+      "Citation guardrails · grounding & audit logs",
+    ],
   },
 } as const;
 
+const AZURE_NODE = [
+  "Model-agnostic routing to FAB-approved Azure OpenAI endpoints",
+  "Verified filings, market news & sanctions feeds, in-tenant",
+  "100% UAE data residency · zero external model training",
+];
+
 const CONTROLS = [
   { icon: Users, title: "Role-based access control", tag: "CBUAE", body: "RM, analyst and credit-committee roles scoped by segment and booking entity; Entra ID SSO." },
-  { icon: KeyRound, title: "Single-virtual-key isolation", tag: "InfoSec", body: "No raw AI or search keys in the app container; rotation and budgets enforced at the gateway." },
+  { icon: KeyRound, title: "Ephemeral token isolation", tag: "InfoSec", body: "No long-lived provider credentials in the application container; rotation, budgets and rate limits enforced in the orchestration core." },
   { icon: ScrollText, title: "Immutable audit logs", tag: "Credit committee", body: "Every prompt, source set and dossier version is hashed and retained for review." },
   { icon: ShieldCheck, title: "Source-level citation verification", tag: "Model risk", body: "Metrics without a resolvable source are flagged, never silently presented." },
   { icon: Lock, title: "UAE data residency", tag: "ADGM / CBUAE", body: "Workloads, logs and vector caches pinned to Azure UAE North; no external model training." },
@@ -45,7 +55,7 @@ const CONTROLS = [
 ];
 
 const ROADMAP = [
-  { weeks: "Weeks 1–2", title: "Container deployment in Azure sandbox", body: "App + gateway containers in FAB's UAE North tenant; SSO, logging and network policies." },
+  { weeks: "Weeks 1–2", title: "Container deployment in Azure sandbox", body: "App + orchestration containers in FAB's UAE North tenant; SSO, logging and network policies." },
   { weeks: "Weeks 3–6", title: "35-RM Wholesale Banking cohort", body: "Live coverage use across GRE, corporate and FI books with weekly feedback loops." },
   { weeks: "Weeks 7–12", title: "Mandate conversion & hours-saved audit", body: "Time-logged hours saved and attributable pipeline reviewed with Finance and Innovation." },
 ];
@@ -76,22 +86,33 @@ function Architecture() {
         <div className="grid-lines p-5 lg:p-8">
           <div className="rounded-lg border border-dashed border-azure/40 p-4 lg:p-6">
             <div className="flex items-center gap-2 text-xs text-azure">
-              <Cloud className="size-4" /> <span className="num">Microsoft Azure · UAE North · FAB private tenant</span>
+              <Cloud className="size-4" /> <span className="num">Sovereign deployment boundary · Microsoft Azure UAE North · FAB private tenant</span>
               <span className="ml-auto num text-[10px] text-muted-foreground">Core42 sovereign controls</span>
             </div>
             <div className="mt-5 grid items-stretch gap-4 lg:grid-cols-[1fr_auto_1.2fr_auto_1fr]">
-              <Node icon={Boxes} title="Kestrel app container" sub="Server-rendered UI + API routes" items={p.app} tone="gold" />
+              <Node
+                icon={Boxes}
+                title="Kestrel Presentation Terminal"
+                sub="Stateless banker interface · zero local credential storage"
+                items={p.app}
+                tone="gold"
+              />
               <Arrow />
-              <Node icon={ServerCog} title="AI gateway container" sub="Audit · rate limits · budgets · semantic cache" items={p.gateway} tone="azure" />
+              <Node
+                icon={ServerCog}
+                title="Kestrel Sovereign Orchestration Core"
+                sub="Policy enforcement · citation grounding · audit trail"
+                items={p.core}
+                tone="azure"
+              />
               <Arrow />
-              <div className="flex flex-col gap-3">
-                {["Azure OpenAI (private endpoint)", "Gemini", "Tavily / SerpAPI", "Deepgram"].map((u, i) => (
-                  <div key={u} className={`rounded-md border bg-card px-3 py-2.5 text-sm ${i === 0 ? "border-emerald/40" : "border-border"}`}>
-                    <div className="num text-[10px] text-muted-foreground">{i === 0 ? "IN-REGION" : "UPSTREAM"}</div>
-                    {u}
-                  </div>
-                ))}
-              </div>
+              <Node
+                icon={Cloud}
+                title="FAB Private Azure Cloud (UAE North)"
+                sub="Microsoft Azure innovation hub · Core42 sovereign controls"
+                items={AZURE_NODE}
+                tone="emerald"
+              />
             </div>
           </div>
           <motion.p key={phase} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 max-w-3xl text-sm text-muted-foreground">
@@ -145,15 +166,33 @@ function Architecture() {
   );
 }
 
-function Node({ icon: Icon, title, sub, items, tone }: { icon: typeof Boxes; title: string; sub: string; items: readonly string[]; tone: "gold" | "azure" }) {
+const TONE = {
+  gold: { border: "border-gold/40", text: "text-gold" },
+  azure: { border: "border-azure/40", text: "text-azure" },
+  emerald: { border: "border-emerald/40", text: "text-emerald" },
+} as const;
+
+function Node({
+  icon: Icon,
+  title,
+  sub,
+  items,
+  tone,
+}: {
+  icon: typeof Boxes;
+  title: string;
+  sub: string;
+  items: readonly string[];
+  tone: keyof typeof TONE;
+}) {
   return (
-    <div className={`rounded-lg border bg-card p-4 ${tone === "gold" ? "border-gold/40" : "border-azure/40"}`}>
-      <Icon className={`size-5 ${tone === "gold" ? "text-gold" : "text-azure"}`} />
+    <div className={`rounded-lg border bg-card p-4 ${TONE[tone].border}`}>
+      <Icon className={`size-5 ${TONE[tone].text}`} />
       <div className="mt-2 font-medium">{title}</div>
       <div className="text-xs text-muted-foreground">{sub}</div>
       <ul className="mt-3 space-y-1.5">
         {items.map((it) => (
-          <motion.li key={it} layout initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} className="num rounded border border-border bg-background/50 px-2 py-1 text-[11px]">
+          <motion.li key={it} layout initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} className="num rounded border border-border bg-background/50 px-2 py-1 text-[11px] leading-relaxed">
             {it}
           </motion.li>
         ))}
