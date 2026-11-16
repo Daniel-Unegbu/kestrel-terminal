@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      institutional_dossiers: {
+        Row: {
+          created_at: string
+          dossier_payload: Json
+          entity_name: string
+          entity_slug: string
+          id: string
+          is_preset: boolean
+          segment: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dossier_payload: Json
+          entity_name: string
+          entity_slug: string
+          id?: string
+          is_preset?: boolean
+          segment: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dossier_payload?: Json
+          entity_name?: string
+          entity_slug?: string
+          id?: string
+          is_preset?: boolean
+          segment?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pilot_simulations: {
+        Row: {
+          avg_mandate_fee_aed: number
+          created_at: string
+          id: string
+          projected_incremental_fee_aed: number
+          rm_count: number
+          weekly_hours_saved: number
+          win_rate_lift_pct: number
+        }
+        Insert: {
+          avg_mandate_fee_aed: number
+          created_at?: string
+          id?: string
+          projected_incremental_fee_aed: number
+          rm_count: number
+          weekly_hours_saved: number
+          win_rate_lift_pct: number
+        }
+        Update: {
+          avg_mandate_fee_aed?: number
+          created_at?: string
+          id?: string
+          projected_incremental_fee_aed?: number
+          rm_count?: number
+          weekly_hours_saved?: number
+          win_rate_lift_pct?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

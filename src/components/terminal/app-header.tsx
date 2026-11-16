@@ -1,0 +1,83 @@
+import { Link, useRouterState } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import { Command, Mic } from "lucide-react";
+import { KestrelMark } from "./kestrel-mark";
+import { MacroTicker } from "./macro-ticker";
+import { useTerminal } from "./terminal-context";
+
+const NAV = [
+  { to: "/", label: "Command Center", pillar: "P1" },
+  { to: "/sandbox", label: "Coverage Sandbox", pillar: "P2" },
+  { to: "/roi-model", label: "ROI Model", pillar: "P5" },
+  { to: "/architecture", label: "Architecture", pillar: "P3·4" },
+] as const;
+
+export function AppHeader() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { setPaletteOpen, setDeskOpen } = useTerminal();
+  return (
+    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl no-print">
+      <MacroTicker />
+      <div className="mx-auto flex h-14 max-w-[1440px] items-center gap-6 px-4 lg:px-6">
+        <Link to="/" className="flex items-center gap-2.5">
+          <KestrelMark />
+          <div className="leading-none">
+            <div className="text-[15px] font-semibold tracking-tight">Kestrel Terminal</div>
+            <div className="eyebrow !text-[9px] mt-1">Institutional Coverage · FAB</div>
+          </div>
+        </Link>
+        <nav className="hidden flex-1 items-center gap-1 md:flex">
+          {NAV.map((n) => {
+            const active = n.to === "/" ? pathname === "/" : pathname.startsWith(n.to);
+            return (
+              <Link
+                key={n.to}
+                to={n.to}
+                className={`relative px-3 py-4 text-sm transition-colors ${active ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                <span className="num mr-1.5 text-[10px] text-muted-foreground">{n.pillar}</span>
+                {n.label}
+                {active && (
+                  <motion.span
+                    layoutId="nav-underline"
+                    className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-gold"
+                    transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                  />
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            onClick={() => setDeskOpen(true)}
+            className="hidden items-center gap-2 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-azure/50 hover:text-azure sm:flex"
+          >
+            <Mic className="size-3.5" /> Deal Desk
+          </button>
+          <button
+            onClick={() => setPaletteOpen(true)}
+            className="flex items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-gold/50 hover:text-foreground"
+          >
+            <Command className="size-3.5" />
+            <span className="hidden sm:inline">Jump to…</span>
+            <kbd className="num rounded border border-border px-1 text-[10px]">⌘K</kbd>
+          </button>
+        </div>
+      </div>
+      <nav className="flex gap-1 overflow-x-auto border-t border-border px-2 md:hidden">
+        {NAV.map((n) => (
+          <Link
+            key={n.to}
+            to={n.to}
+            className="whitespace-nowrap px-3 py-2.5 text-xs text-muted-foreground"
+            activeProps={{ className: "text-gold" }}
+            activeOptions={{ exact: n.to === "/" }}
+          >
+            {n.label}
+          </Link>
+        ))}
+      </nav>
+    </header>
+  );
+}
