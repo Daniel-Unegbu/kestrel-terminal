@@ -121,13 +121,18 @@ these functions through `supabase.functions.invoke` in `src/lib/edge.ts`.
 
 ## 6. Frontend variables
 
-The Vite client needs the project URL and publishable key at build time. These
-are **public** values, safe to expose:
+The Vite client reads `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` at build
+time. If the host provides neither, `src/integrations/supabase/client.ts` falls
+back to the bundled public project URL and publishable key, so a deploy still
+connects. Setting them explicitly is preferred:
 
 ```bash
 VITE_SUPABASE_URL=https://jovejkbnutimnpjprsva.supabase.co
 VITE_SUPABASE_ANON_KEY=sb_publishable_...
 ```
+
+Both values are public and protected by RLS — they are not secrets. If the key is
+ever rotated, update the fallback in `client.ts` as well as the host variables.
 
 Set them in Vercel for Production/Preview and rebuild. A Vite build that ran
 without them ships a bundle that cannot reach the project, so every dossier load
