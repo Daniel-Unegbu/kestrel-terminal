@@ -16,8 +16,8 @@ export type ResearchResult =
 type DossierRow = Database["public"]["Tables"]["institutional_dossiers"]["Row"];
 
 /**
- * Calls the `research` Edge Function. Runs Tavily/SerpAPI retrieval, direct
- * Gemini synthesis and the dossier upsert server-side.
+ * Calls the `research-entity` Edge Function: Tavily deep research, direct
+ * Gemini synthesis and the dossier upsert all happen server-side.
  */
 export const runResearch = async ({
   data,
@@ -25,8 +25,10 @@ export const runResearch = async ({
   data: { entity: string; deep?: boolean };
 }): Promise<ResearchResult> => {
   try {
-    return await invokeEdge<ResearchResult>("research", {
-      entity: data.entity,
+    return await invokeEdge<ResearchResult>("research-entity", {
+      query: data.entity,
+      // "Deep synthesis" also forces a refresh so the Pro model is used on new data.
+      forceRefresh: data.deep ?? false,
       deep: data.deep ?? false,
     });
   } catch (error) {

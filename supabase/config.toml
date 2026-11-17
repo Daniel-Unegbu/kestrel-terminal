@@ -3,17 +3,14 @@ project_id = "jovejkbnutimnpjprsva"
 # The app authenticates Edge Function calls with the publishable key on the
 # `apikey` header. Publishable/secret keys are not JWTs, so the platform JWT
 # check is disabled and each function validates the apikey itself.
-[functions.research]
+[functions.research-entity]
+verify_jwt = false
+
+[functions.voice-brief]
+verify_jwt = false
+
+[functions.dealdesk-qa]
 verify_jwt = false
 
 [functions.pilot-simulation]
-verify_jwt = false
-
-[functions.deal-desk]
-verify_jwt = false
-
-[functions.text-to-speech]
-verify_jwt = false
-
-[functions.speech-to-text]
 verify_jwt = false
