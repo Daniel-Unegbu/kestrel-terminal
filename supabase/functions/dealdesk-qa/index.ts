@@ -70,10 +70,9 @@ Deno.serve(async (req) => {
 
     if (transcribeOnly) return json({ ok: true, transcript }, 200, cors);
 
-    const searchQuery = [entityName, transcript].filter(Boolean).join(" ").trim();
-    const { answerText, results } = await googleSearch(searchQuery, 4);
+    const { query, answerText, results } = await googleSearch(entityName ?? "", transcript, 4);
 
-    return json({ ok: true, transcript, answerText, results }, 200, cors);
+    return json({ ok: true, transcript, query, answerText, results }, 200, cors);
   } catch (error) {
     const message = errorMessage(error);
     console.error("dealdesk-qa failed", message);

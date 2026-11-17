@@ -123,9 +123,12 @@ export const askDealDesk = async ({
     };
   } catch (error) {
     console.error("Deal desk failed", error);
+    const detail = error instanceof Error ? error.message : "";
     return {
       ok: false,
-      error: "The Deal Desk couldn't answer right now. Please try again.",
+      error: detail
+        ? `The Deal Desk couldn't answer right now (${detail}). Please try again.`
+        : "The Deal Desk couldn't answer right now. Please try again.",
     };
   }
 };

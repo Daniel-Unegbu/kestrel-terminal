@@ -3,14 +3,14 @@
 Project ref: `jovejkbnutimnpjprsva` (independent Supabase project, no Lovable Cloud,
 no Drizzle, no external AI gateway).
 
-| Path | Purpose |
-| --- | --- |
-| `migrations/` | Postgres schema, indexes, grants, RLS |
-| `functions/research-entity/` | Tavily deep research + direct Gemini JSON synthesis, cached in `institutional_dossiers` |
-| `functions/voice-brief/` | Deepgram Aura TTS only — returns raw `audio/mpeg` |
-| `functions/dealdesk-qa/` | Deepgram Nova STT + SerpAPI Google search — **no Gemini** |
-| `functions/pilot-simulation/` | ROI snapshots for the Wholesale ROI Simulator |
-| `functions/_shared/` | CORS, publishable-key gate, admin client, provider adapters, schema, ROI model |
+| Path                          | Purpose                                                                                 |
+| ----------------------------- | --------------------------------------------------------------------------------------- |
+| `migrations/`                 | Postgres schema, indexes, grants, RLS                                                   |
+| `functions/research-entity/`  | Tavily deep research + direct Gemini JSON synthesis, cached in `institutional_dossiers` |
+| `functions/voice-brief/`      | Deepgram Aura TTS only — returns raw `audio/mpeg`                                       |
+| `functions/dealdesk-qa/`      | Deepgram Nova STT + SerpAPI Google search — **no Gemini**                               |
+| `functions/pilot-simulation/` | ROI snapshots for the Wholesale ROI Simulator                                           |
+| `functions/_shared/`          | CORS, publishable-key gate, admin client, provider adapters, schema, ROI model          |
 
 ## 1. Secrets
 
@@ -33,14 +33,17 @@ Optional: `ALLOWED_ORIGINS` (comma-separated list; unset means `*`),
 **One `GEMINI_API_KEY` covers every Gemini model.** Tier selection is only a model
 name in the request path (`functions/_shared/gemini.ts`):
 
-| Mode | Model | Fallback chain |
-| --- | --- | --- |
-| Standard synthesis (`deep: false`) | `gemini-3.5-flash-lite` | `gemini-2.5-flash` |
-| Deep synthesis (`deep: true`) | `gemini-3.8-flash` | `gemini-3.5-flash-lite` → `gemini-2.5-flash` |
+| Mode                               | Model                   | Behaviour                              |
+| ---------------------------------- | ----------------------- | -------------------------------------- |
+| Standard synthesis (`deep: false`) | `gemini-3.5-flash-lite` | cached when possible                   |
+| Deep synthesis (`deep: true`)      | `gemini-3.5-flash-lite` | forces a refresh, larger prompt budget |
 
-`research-entity` returns `synthesisModel` so a silent fallback is visible. A
-`503 UNAVAILABLE` means Google is throttling that model — the request still
-succeeds on the next model in the chain.
+There is **no** fallback model and no Pro tier: `gemini-3.8-flash` is paused to
+protect the token quota and `gemini-2.5-flash` is retired. Failures are retried
+twice on `429`/`5xx` (a rejected call costs no tokens), then return
+`502 synthesis_unavailable`.
+
+`research-entity` returns `synthesisModel` so the model that answered is explicit.
 
 Never put any of these keys in Vercel or in the repo. The browser only ever holds
 the publishable key.

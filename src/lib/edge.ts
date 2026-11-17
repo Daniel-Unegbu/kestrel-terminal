@@ -4,11 +4,37 @@ import { supabase } from "@/integrations/supabase/client";
 export type EdgeFunctionName =
   "research-entity" | "voice-brief" | "dealdesk-qa" | "pilot-simulation";
 
+/**
+ * Reads the body of a failed function call. The Edge gateway returns JSON for
+ * its own errors (e.g. `{"code":"404","message":"Requested function was not
+ * found"}`), so keep a text fallback instead of assuming JSON.
+ */
 async function errorPayload(error: FunctionsHttpError): Promise<unknown | null> {
-  return error.context
+  const raw = await error.context
     .clone()
-    .json()
-    .catch(() => null);
+    .text()
+    .catch(() => "");
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return raw;
+  }
+}
+
+function describeFailure(
+  name: EdgeFunctionName,
+  error: FunctionsHttpError,
+  payload: unknown,
+): string {
+  const status = error.context?.status;
+  const detail =
+    typeof payload === "string"
+      ? payload.slice(0, 180)
+      : payload
+        ? JSON.stringify(payload).slice(0, 180)
+        : error.message;
+  return `Edge Function ${name} failed${status ? ` (${status})` : ""}: ${detail}`;
 }
 
 /**
@@ -28,9 +54,10 @@ export async function invokeEdge<T>(name: EdgeFunctionName, body: object): Promi
     if (payload && typeof payload === "object" && "ok" in payload) {
       return payload as T;
     }
+    throw new Error(describeFailure(name, error, payload));
   }
 
-  throw error;
+  throw new Error(`Edge Function ${name} could not be reached: ${error.message}`);
 }
 
 /**
@@ -51,8 +78,9 @@ export async function invokeEdgeAudio(
       if (payload && typeof payload === "object" && "ok" in payload) {
         throw Object.assign(new Error("voice-failed"), { payload });
       }
+      throw new Error(describeFailure(name, error, payload));
     }
-    throw error;
+    throw new Error(`Edge Function ${name} could not be reached: ${error.message}`);
   }
 
   if (data instanceof Blob) return { blob: data, mime: data.type || "audio/mpeg" };

@@ -33,9 +33,12 @@ export const runResearch = async ({
     });
   } catch (error) {
     console.error("Research failed", error);
+    const detail = error instanceof Error ? error.message : "";
     return {
       ok: false,
-      error: "The research pipeline couldn't complete this dossier. Please try again.",
+      error: detail
+        ? `The research pipeline couldn't complete this dossier (${detail}). Please try again.`
+        : "The research pipeline couldn't complete this dossier. Please try again.",
     };
   }
 };
