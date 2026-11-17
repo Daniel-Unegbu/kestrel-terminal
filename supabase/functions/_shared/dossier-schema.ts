@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "npm:zod@3";
 
 // Lenient runtime validation for model output: coerces numbers, clamps enums to safe defaults.
 const num = (d = 0) => z.coerce.number().catch(d);
@@ -20,7 +20,9 @@ export const generatedDossierSchema = z.object({
     netDebtToEbitda: num(),
     interestCoverageRatio: num(),
     cashConversionCycleDays: num(),
-    creditRiskRating: z.enum(["LOW_RISK", "MODERATE_WATCH", "ELEVATED_REVIEW"]).catch("MODERATE_WATCH"),
+    creditRiskRating: z
+      .enum(["LOW_RISK", "MODERATE_WATCH", "ELEVATED_REVIEW"])
+      .catch("MODERATE_WATCH"),
     sourceRefs: refs,
   }),
   workingCapital: z
@@ -32,13 +34,21 @@ export const generatedDossierSchema = z.object({
       tradeFinanceVelocity: z.string().catch("Undisclosed"),
       sourceRefs: refs,
     })
-    .catch({ dsoDays: 0, dioDays: 0, dpoDays: 0, trappedLiquidityAEDMillions: 0, tradeFinanceVelocity: "Undisclosed" }),
+    .catch({
+      dsoDays: 0,
+      dioDays: 0,
+      dpoDays: 0,
+      trappedLiquidityAEDMillions: 0,
+      tradeFinanceVelocity: "Undisclosed",
+    }),
   debtMaturityProfile: z
     .array(
       z.object({
         year: z.coerce.string(),
         maturingDebtAEDMillions: num(),
-        instrumentType: z.enum(["Syndicated Loan", "Sukuk / Bond", "Trade Facility"]).catch("Syndicated Loan"),
+        instrumentType: z
+          .enum(["Syndicated Loan", "Sukuk / Bond", "Trade Facility"])
+          .catch("Syndicated Loan"),
       }),
     )
     .catch([]),
@@ -57,7 +67,12 @@ export const generatedDossierSchema = z.object({
     .array(
       z.object({
         division: z
-          .enum(["Global Corporate Finance", "Global Transaction Banking", "Global Markets", "FAB Siraj Islamic Banking"])
+          .enum([
+            "Global Corporate Finance",
+            "Global Transaction Banking",
+            "Global Markets",
+            "FAB Siraj Islamic Banking",
+          ])
           .catch("Global Corporate Finance"),
         recommendedProduct: z.string(),
         triggerSignal: z.string().catch(""),
@@ -71,7 +86,12 @@ export const generatedDossierSchema = z.object({
     .array(
       z.object({
         category: z
-          .enum(["CBUAE / Regulatory", "Sanctions & Adverse Media", "FX & Corridor Risk", "ESG / Transition Finance"])
+          .enum([
+            "CBUAE / Regulatory",
+            "Sanctions & Adverse Media",
+            "FX & Corridor Risk",
+            "ESG / Transition Finance",
+          ])
           .catch("CBUAE / Regulatory"),
         severity: z.enum(["INFO", "WATCH", "CRITICAL"]).catch("INFO"),
         finding: z.string(),

@@ -1,61 +1,87 @@
-import { generateChatCompletion } from "@lovable.dev/ai-gateway";
-import type { DossierSource, InstitutionalDossier } from "./dossier";
-import { generatedDossierSchema } from "./dossier-schema";
+import type { DossierSource, InstitutionalDossier } from "./dossier.ts";
+import { generatedDossierSchema } from "./dossier-schema.ts";
+import { generateJson } from "./gemini.ts";
 
 export interface RetrievedDoc extends DossierSource {
   snippet: string;
 }
 
 export async function tavilySearch(query: string): Promise<RetrievedDoc[]> {
-  const key = process.env["TAVILY_API_KEY"];
+  const key = Deno.env.get("TAVILY_API_KEY");
   if (!key) return [];
+
   const res = await fetch("https://api.tavily.com/search", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
-    body: JSON.stringify({ query, search_depth: "advanced", max_results: 8, include_answer: false }),
+    body: JSON.stringify({
+      query,
+      search_depth: "advanced",
+      max_results: 8,
+      include_answer: false,
+    }),
   });
+
   if (!res.ok) {
     console.error("Tavily error", res.status, await res.text().catch(() => ""));
     return [];
   }
-  const json = (await res.json()) as { results?: Array<{ title?: string; url?: string; content?: string }> };
+
+  const json = (await res.json()) as {
+    results?: Array<{ title?: string; url?: string; content?: string }>;
+  };
+
   return (json.results ?? [])
-    .filter((r) => r.url)
-    .map((r) => ({ title: r.title ?? r.url!, url: r.url!, snippet: (r.content ?? "").slice(0, 900), provider: "RESEARCH" as const }));
+    .filter((result) => result.url)
+    .map((result) => ({
+      title: result.title ?? result.url!,
+      url: result.url!,
+      snippet: (result.content ?? "").slice(0, 900),
+      provider: "RESEARCH" as const,
+    }));
 }
 
 export async function serpSearch(query: string): Promise<RetrievedDoc[]> {
-  const key = process.env["SERPAPI_API_KEY"];
+  const key = Deno.env.get("SERPAPI_API_KEY");
   if (!key) return [];
+
   const url = new URL("https://serpapi.com/search.json");
   url.searchParams.set("engine", "google_news");
   url.searchParams.set("q", query);
   url.searchParams.set("api_key", key);
+
   const res = await fetch(url);
   if (!res.ok) {
     console.error("SerpAPI error", res.status);
     return [];
   }
+
   const json = (await res.json()) as {
-    news_results?: Array<{ title?: string; link?: string; snippet?: string; source?: { name?: string } }>;
+    news_results?: Array<{
+      title?: string;
+      link?: string;
+      snippet?: string;
+      source?: { name?: string };
+    }>;
   };
+
   return (json.news_results ?? [])
-    .filter((r) => r.link)
+    .filter((result) => result.link)
     .slice(0, 6)
-    .map((r) => ({
-      title: r.title ?? r.link!,
-      url: r.link!,
-      snippet: (r.snippet ?? r.source?.name ?? "").slice(0, 600),
+    .map((result) => ({
+      title: result.title ?? result.link!,
+      url: result.link!,
+      snippet: (result.snippet ?? result.source?.name ?? "").slice(0, 600),
       provider: "SEARCH" as const,
     }));
 }
 
 export async function retrieve(entity: string): Promise<RetrievedDoc[]> {
-  const q = `${entity} financial results debt bonds sukuk refinancing expansion news`;
+  const query = `${entity} financial results debt bonds sukuk refinancing expansion news`;
   const [primary, sanctions] = await Promise.all([
-    tavilySearch(q),
+    tavilySearch(query),
     tavilySearch(`${entity} regulatory sanctions ESG news`),
   ]);
+
   let docs = dedupe([...primary, ...sanctions]);
   if (docs.length < 4) {
     docs = dedupe([...docs, ...(await serpSearch(entity))]);
@@ -65,7 +91,7 @@ export async function retrieve(entity: string): Promise<RetrievedDoc[]> {
 
 function dedupe(docs: RetrievedDoc[]) {
   const seen = new Set<string>();
-  return docs.filter((d) => (seen.has(d.url) ? false : (seen.add(d.url), true)));
+  return docs.filter((doc) => (seen.has(doc.url) ? false : (seen.add(doc.url), true)));
 }
 
 const SYSTEM = `You are a senior credit analyst in First Abu Dhabi Bank's Wholesale Banking and IB&M coverage team.
@@ -93,57 +119,49 @@ export async function synthesize(
   deep: boolean,
 ): Promise<InstitutionalDossier> {
   const sourcesBlock = docs
-    .map((d, i) => `[${i}] ${d.title}\nURL: ${d.url}\n${d.snippet}`)
+    .map((doc, index) => `[${index}] ${doc.title}\nURL: ${doc.url}\n${doc.snippet}`)
     .join("\n\n");
-  const messages = [
-    { role: "system" as const, content: SYSTEM },
-    { role: "user" as const, content: `ENTITY: ${entity}\n\nSOURCES:\n${sourcesBlock || "(no sources retrieved)"}\n\nReturn the dossier JSON.` },
-  ];
-  const response = deep
-    ? await generateChatCompletion({ model: "google/gemini-3.1-pro-preview", messages, response_format: { type: "json_object" } })
-    : await generateChatCompletion({ model: "google/gemini-3.8-flash", messages, response_format: { type: "json_object" } });
 
-  const raw = extractText(response.choices?.[0]?.message?.content);
-  const parsed = generatedDossierSchema.parse(JSON.parse(stripFences(raw)));
+  const parsed = generatedDossierSchema.parse(
+    await generateJson({
+      system: SYSTEM,
+      user: `ENTITY: ${entity}\n\nSOURCES:\n${sourcesBlock || "(no sources retrieved)"}\n\nReturn the dossier JSON.`,
+      deep,
+      temperature: 0.3,
+    }),
+  );
+
   const maxRef = docs.length - 1;
-  const cleanRefs = (r?: number[]) => r?.filter((n) => n >= 0 && n <= maxRef);
+  const cleanRefs = (refs?: number[]) => refs?.filter((n) => n >= 0 && n <= maxRef);
 
   return {
     ...parsed,
     entityName: parsed.entityName || entity,
     lastUpdatedIso: new Date().toISOString(),
-    financialMetrics: { ...parsed.financialMetrics, sourceRefs: cleanRefs(parsed.financialMetrics.sourceRefs) },
-    workingCapital: { ...parsed.workingCapital, sourceRefs: cleanRefs(parsed.workingCapital.sourceRefs) },
-    fabDivisionRouting: parsed.fabDivisionRouting.map((r) => ({
-      ...r,
-      confidenceScore: Math.max(0, Math.min(100, Math.round(r.confidenceScore))),
-      sourceRefs: cleanRefs(r.sourceRefs),
+    financialMetrics: {
+      ...parsed.financialMetrics,
+      sourceRefs: cleanRefs(parsed.financialMetrics.sourceRefs),
+    },
+    workingCapital: {
+      ...parsed.workingCapital,
+      sourceRefs: cleanRefs(parsed.workingCapital.sourceRefs),
+    },
+    fabDivisionRouting: parsed.fabDivisionRouting.map((route) => ({
+      ...route,
+      confidenceScore: Math.max(0, Math.min(100, Math.round(route.confidenceScore))),
+      sourceRefs: cleanRefs(route.sourceRefs),
     })),
-    complianceAndRiskRadar: parsed.complianceAndRiskRadar.map((c) => {
-      const src = c.sourceIndex != null ? docs[c.sourceIndex] : undefined;
+    complianceAndRiskRadar: parsed.complianceAndRiskRadar.map((item) => {
+      const source = item.sourceIndex != null ? docs[item.sourceIndex] : undefined;
       return {
-        category: c.category,
-        severity: c.severity,
-        finding: c.finding,
-        sourceTitle: src?.title ?? "No direct source",
-        sourceUrl: src?.url ?? "",
-        searchProvider: src?.provider ?? "REFERENCE",
+        category: item.category,
+        severity: item.severity,
+        finding: item.finding,
+        sourceTitle: source?.title ?? "No direct source",
+        sourceUrl: source?.url ?? "",
+        searchProvider: source?.provider ?? ("REFERENCE" as const),
       };
     }),
     sources: docs.map(({ title, url, provider }) => ({ title, url, provider })),
   };
-}
-
-export function extractText(content: unknown): string {
-  if (typeof content === "string") return content;
-  if (Array.isArray(content)) {
-    return content
-      .map((p) => (p && typeof p === "object" && "text" in p ? String((p as { text: unknown }).text) : ""))
-      .join("");
-  }
-  return "";
-}
-
-export function stripFences(s: string) {
-  return s.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
 }
