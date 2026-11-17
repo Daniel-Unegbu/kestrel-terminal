@@ -2,10 +2,19 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
+/**
+ * The project URL and publishable key are public by design (they ship in every
+ * browser bundle and are protected by RLS), so they are kept as defaults. This
+ * keeps the deployed build working even when the host has not injected the
+ * VITE_* variables, which Vite bakes in at build time.
+ */
+const DEFAULT_URL = "https://jovejkbnutimnpjprsva.supabase.co";
+const DEFAULT_KEY = "sb_publishable_3IBcVicYgnz73YcT7Q2DvQ_oaYTDZZN";
+
 function readEnv(name: string): string | undefined {
   const viteEnv = import.meta.env as Record<string, string | undefined>;
   if (viteEnv[name]) return viteEnv[name];
-  if (typeof process !== "undefined") return process.env[name];
+  if (typeof process !== "undefined" && process.env?.[name]) return process.env[name];
   return undefined;
 }
 
@@ -34,8 +43,16 @@ function createSupabaseFetch(key: string): typeof fetch {
 }
 
 function createSupabaseClient() {
-  const url = readEnv("VITE_SUPABASE_URL") ?? readEnv("SUPABASE_URL");
-  const key = readEnv("VITE_SUPABASE_ANON_KEY") ?? readEnv("SUPABASE_ANON_KEY");
+  const url =
+    readEnv("VITE_SUPABASE_URL") ??
+    readEnv("NEXT_PUBLIC_SUPABASE_URL") ??
+    readEnv("SUPABASE_URL") ??
+    DEFAULT_URL;
+  const key =
+    readEnv("VITE_SUPABASE_ANON_KEY") ??
+    readEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY") ??
+    readEnv("SUPABASE_ANON_KEY") ??
+    DEFAULT_KEY;
 
   if (!url || !key) {
     const missing = [
