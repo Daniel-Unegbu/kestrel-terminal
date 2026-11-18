@@ -161,7 +161,7 @@ export function DossierView({ dossier, cacheKey }: { dossier: InstitutionalDossi
         </Module>
 
         {/* 5 Product fit */}
-        <Module index={4} title="FAB Division Product-Fit Matrix" code="M-05" className="lg:col-span-7">
+        <Module index={4} title="Division Product-Fit Matrix" code="M-05" className="lg:col-span-7">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -212,7 +212,7 @@ export function DossierView({ dossier, cacheKey }: { dossier: InstitutionalDossi
                 </div>
                 <div className="w-24 text-right">
                   <div className="num text-xs">{Math.round(c.flowSharePct)}%</div>
-                  <div className="text-[10px] text-muted-foreground">FAB {c.fabHub}</div>
+                  <div className="text-[10px] text-muted-foreground">{c.fabHub}</div>
                 </div>
               </li>
             ))}

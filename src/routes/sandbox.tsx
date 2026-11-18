@@ -24,10 +24,10 @@ export const Route = createFileRoute("/sandbox")({
       { title: "Coverage & Credit Research Sandbox — Kestrel Terminal" },
       {
         name: "description",
-        content: "Generate cited institutional banking dossiers for GREs, corporates, financial institutions and SMEs — with debt walls, FX corridors and FAB division routing.",
+        content: "Generate cited institutional banking dossiers for GREs, corporates, financial institutions and SMEs — with debt walls, FX corridors and division routing.",
       },
       { property: "og:title", content: "Coverage & Credit Research Sandbox — Kestrel Terminal" },
-      { property: "og:description", content: "Cited banking dossiers in seconds, routed to the FAB division that should lead." },
+      { property: "og:description", content: "Cited banking dossiers in seconds, routed to the division that should lead." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

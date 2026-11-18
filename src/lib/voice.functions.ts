@@ -11,6 +11,10 @@ interface DealDeskQaResponse {
   ok?: boolean;
   transcript?: string;
   answerText?: string;
+  spokenText?: string;
+  answerSource?: string;
+  leadDivision?: string;
+  sourceUrls?: string[];
   results?: Array<{ title: string; snippet: string; url: string }>;
   error?: string;
 }
@@ -18,7 +22,7 @@ interface DealDeskQaResponse {
 interface DossierLite {
   entityName?: string;
   fabDivisionRouting?: Array<{ division?: string }>;
-  sources?: unknown[];
+  sources?: Array<{ url?: string }>;
 }
 
 async function blobToBase64(blob: Blob): Promise<string> {
@@ -82,9 +86,9 @@ export const transcribeAudio = async ({
 };
 
 /**
- * dealdesk-qa: SerpAPI Google search only (no Gemini). The UI renders a single
- * answer plus source refs, so the SerpAPI answer text and the dossier's lead
- * division are mapped onto that shape.
+ * dealdesk-qa: dossier answers for client-file questions, SerpAPI Google search
+ * for everything else (no Gemini). The edge function returns a single answer
+ * plus the lead division and source URLs; those map onto the UI's shape.
  */
 export const askDealDesk = async ({
   data,
@@ -102,6 +106,7 @@ export const askDealDesk = async ({
     const res = await invokeEdge<DealDeskQaResponse>("dealdesk-qa", {
       questionText: data.question,
       entityName: dossier.entityName ?? "",
+      dossierJson: data.dossierJson,
     });
 
     if (!res?.ok || !res.answerText) {
@@ -114,12 +119,19 @@ export const askDealDesk = async ({
       };
     }
 
+    // Edge returns dossier source URLs; turn them into indices into the
+    // dossier's source list so the citation badges line up.
+    const sourceRefs = (res.sourceUrls ?? [])
+      .map((url) => (dossier.sources ?? []).findIndex((source) => source?.url === url))
+      .filter((index) => index >= 0);
+
     return {
       ok: true,
       answer: res.answerText,
-      spoken: firstSentences(res.answerText),
-      leadDivision: dossier.fabDivisionRouting?.[0]?.division ?? "Global Corporate Finance",
-      sourceRefs: [],
+      spoken: res.spokenText ?? firstSentences(res.answerText),
+      leadDivision:
+        res.leadDivision ?? dossier.fabDivisionRouting?.[0]?.division ?? "Global Corporate Finance",
+      sourceRefs,
     };
   } catch (error) {
     console.error("Deal desk failed", error);

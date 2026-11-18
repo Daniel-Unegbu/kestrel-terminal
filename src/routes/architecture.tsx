@@ -25,11 +25,11 @@ const PHASES = {
     label: "Phase 1 · Rapid prototype",
     note: "The application tier calls research and voice connectors directly while the orchestration core governs model inference only — the fastest path to a working pilot.",
     app: ["Internal Database · session & dossier cache", "Microsoft Entra ID (SSO) · RBAC", "Research, Search & Voice connectors"],
-    core: ["Ephemeral session token", "Model routing · FAB-approved endpoint"],
+    core: ["Ephemeral session token", "Model routing · approved endpoint"],
   },
   enterprise: {
     label: "Phase 2 · Zero-secret enterprise",
-    note: "Every upstream credential is consolidated inside the orchestration core. The application container holds a single ephemeral session token, and the model provider can be repointed to FAB's private Azure OpenAI endpoint with one configuration change — no application code changes.",
+    note: "Every upstream credential is consolidated inside the orchestration core. The application container holds a single ephemeral session token, and the model provider can be repointed to a private Azure OpenAI endpoint with one configuration change — no application code changes.",
     app: ["Internal Database · session & dossier cache", "Microsoft Entra ID (SSO) · RBAC", "M365 triggers · Outlook & Teams sync"],
     core: [
       "Single ephemeral session token · zero key sprawl",
@@ -40,7 +40,7 @@ const PHASES = {
 } as const;
 
 const AZURE_NODE = [
-  "Model-agnostic routing to FAB-approved Azure OpenAI endpoints",
+  "Model-agnostic routing to approved Azure OpenAI endpoints",
   "Verified filings, market news & sanctions feeds, in-tenant",
   "100% UAE data residency · zero external model training",
 ];
@@ -55,7 +55,7 @@ const CONTROLS = [
 ];
 
 const ROADMAP = [
-  { weeks: "Weeks 1–2", title: "Container deployment in Azure sandbox", body: "App + orchestration containers in FAB's UAE North tenant; SSO, logging and network policies." },
+  { weeks: "Weeks 1–2", title: "Container deployment in Azure sandbox", body: "App + orchestration containers in the UAE North tenant; SSO, logging and network policies." },
   { weeks: "Weeks 3–6", title: "35-RM Wholesale Banking cohort", body: "Live coverage use across GRE, corporate and FI books with weekly feedback loops." },
   { weeks: "Weeks 7–12", title: "Mandate conversion & hours-saved audit", body: "Time-logged hours saved and attributable pipeline reviewed with Finance and Innovation." },
 ];
@@ -86,7 +86,7 @@ function Architecture() {
         <div className="grid-lines p-5 lg:p-8">
           <div className="rounded-lg border border-dashed border-azure/40 p-4 lg:p-6">
             <div className="flex items-center gap-2 text-xs text-azure">
-              <Cloud className="size-4" /> <span className="num">Sovereign deployment boundary · Microsoft Azure UAE North · FAB private tenant</span>
+              <Cloud className="size-4" /> <span className="num">Sovereign deployment boundary · Microsoft Azure UAE North · private tenant</span>
               <span className="ml-auto num text-[10px] text-muted-foreground">Core42 sovereign controls</span>
             </div>
             <div className="mt-5 grid items-stretch gap-4 lg:grid-cols-[1fr_auto_1.2fr_auto_1fr]">
@@ -108,7 +108,7 @@ function Architecture() {
               <Arrow />
               <Node
                 icon={Cloud}
-                title="FAB Private Azure Cloud (UAE North)"
+                title="Private Azure Cloud (UAE North)"
                 sub="Microsoft Azure innovation hub · Core42 sovereign controls"
                 items={AZURE_NODE}
                 tone="emerald"

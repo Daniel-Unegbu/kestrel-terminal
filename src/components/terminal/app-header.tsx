@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Command, Mic } from "lucide-react";
+import { UAE_MARKET_COPY } from "@/lib/fab-references";
 import { KestrelMark } from "./kestrel-mark";
 import { MacroTicker } from "./macro-ticker";
 import { useTerminal } from "./terminal-context";
@@ -23,7 +24,7 @@ export function AppHeader() {
           <KestrelMark />
           <div className="leading-none">
             <div className="text-[15px] font-semibold tracking-tight">Kestrel Terminal</div>
-            <div className="eyebrow !text-[9px] mt-1">Institutional Coverage · FAB</div>
+            <div className="eyebrow !text-[9px] mt-1">{UAE_MARKET_COPY.headerSubtitle}</div>
           </div>
         </Link>
         <nav className="hidden flex-1 items-center gap-1 md:flex">

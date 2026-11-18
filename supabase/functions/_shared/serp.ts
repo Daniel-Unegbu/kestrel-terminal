@@ -10,7 +10,16 @@ export interface SerpAnswer {
   /** The trimmed query actually sent to Google. */
   query: string;
   answerText: string;
+  /** Which SERP feature produced the answer — useful when tuning. */
+  answerSource: "answer_box" | "related_questions" | "knowledge_graph" | "organic" | "none";
   results: SerpResult[];
+}
+
+interface RelatedQuestion {
+  question?: string;
+  snippet?: string;
+  title?: string;
+  link?: string;
 }
 
 interface SerpPayload {
@@ -19,10 +28,12 @@ interface SerpPayload {
     snippet?: string;
     title?: string;
     link?: string;
+    list?: unknown;
   };
   knowledge_graph?: { description?: string; title?: string; source?: { link?: string } };
   organic_results?: Array<{ title?: string; snippet?: string; link?: string }>;
   news_results?: Array<{ title?: string; snippet?: string; link?: string; date?: string }>;
+  related_questions?: RelatedQuestion[];
   error?: string;
 }
 
@@ -177,9 +188,9 @@ const STOPWORDS = new Set([
 
 const MAX_KEYWORDS = 6;
 
-/** Questions about risk/outlook/markets are better served by Google News. */
-const NEWS_INTENT =
-  /\b(news|latest|recent|today|outlook|risk|risks|rating|ratings|market|update|2026)\b/i;
+/** Only explicit news/recency intent switches to Google News — forcing it for
+ * "risk" questions replaces Google's answer box with bare headlines. */
+const NEWS_INTENT = /\b(news|latest|recent|today|this week|update|announcement|announced)\b/i;
 
 /** Reputable outlets first; forums and lead-gen blogs last. */
 const AUTHORITATIVE = [
@@ -253,6 +264,35 @@ function overlap(text: string, keywords: string[]): number {
   return keywords.reduce((score, word) => (haystack.includes(word) ? score + 1 : score), 0);
 }
 
+/**
+ * Google's knowledge panel carries the fact itself (`ceo`, `headquarters`,
+ * `founded`, …). When the question names one of those attributes, return the
+ * value instead of the generic company description.
+ */
+function knowledgeFact(
+  knowledge: Record<string, unknown> | undefined,
+  keywords: string[],
+): string | null {
+  if (!knowledge) return null;
+
+  const skipped = new Set(["description", "title", "source", "type", "image", "thumbnail", "link"]);
+
+  for (const [key, value] of Object.entries(knowledge)) {
+    if (skipped.has(key)) continue;
+    const keyTokens = tokenize(key);
+    if (!keyTokens.some((token) => keywords.includes(token))) continue;
+
+    const record = value as { name?: unknown; value?: unknown } | null;
+    const text = asText(value) || asText(record?.name) || asText(record?.value);
+    if (!text || text.length > 300) continue;
+
+    const label = key.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+    return `${label}: ${text}`;
+  }
+
+  return null;
+}
+
 /** A company's own landing page rarely answers a question — rank it last. */
 function isEntityHomepage(url: string, entityName: string): boolean {
   try {
@@ -265,6 +305,52 @@ function isEntityHomepage(url: string, entityName: string): boolean {
   }
 }
 
+/** Prefers the same features Google itself uses to answer a query directly. */
+function pickAnswer(
+  payload: SerpPayload,
+  ranked: Array<{ title?: string; snippet?: string; link?: string }>,
+  keywords: string[],
+): { text: string; source: SerpAnswer["answerSource"] } {
+  const box = payload.answer_box;
+  const direct = asText(box?.answer) || asText(box?.snippet) || asText(box?.list);
+  if (direct) return { text: direct, source: "answer_box" };
+
+  // "People also ask" rows are literal question/answer pairs from Google.
+  const related = (payload.related_questions ?? [])
+    .filter((item) => !!item.snippet)
+    .sort(
+      (a, b) =>
+        overlap(`${b.question ?? ""} ${b.snippet ?? ""}`, keywords) -
+        overlap(`${a.question ?? ""} ${a.snippet ?? ""}`, keywords),
+    );
+  if (related[0]?.snippet) {
+    return { text: asText(related[0].snippet), source: "related_questions" };
+  }
+
+  const fact = knowledgeFact(
+    payload.knowledge_graph as Record<string, unknown> | undefined,
+    keywords,
+  );
+  if (fact) return { text: fact, source: "knowledge_graph" };
+
+  const knowledge = asText(payload.knowledge_graph?.description);
+  if (knowledge) return { text: knowledge, source: "knowledge_graph" };
+
+  // For the answer itself, topical relevance beats outlet prestige; the citation
+  // list keeps its authority-first ordering.
+  const best = [...ranked].sort((a, b) => {
+    const overlapA = overlap(`${a.title ?? ""} ${a.snippet ?? ""}`, keywords);
+    const overlapB = overlap(`${b.title ?? ""} ${b.snippet ?? ""}`, keywords);
+    if (overlapB !== overlapA) return overlapB - overlapA;
+    return domainRank(b.link!) - domainRank(a.link!);
+  })[0];
+
+  const top = asText(best?.snippet) || asText(best?.title);
+  if (top) return { text: top, source: "organic" };
+
+  return { text: "No direct market filing found for that specific query.", source: "none" };
+}
+
 /**
  * Google native search through SerpAPI. The answer is read straight out of the
  * payload — no LLM is involved in the Deal Desk path.
@@ -272,7 +358,7 @@ function isEntityHomepage(url: string, entityName: string): boolean {
 export async function googleSearch(
   entityName: string,
   question: string,
-  num = 4,
+  num = 10,
 ): Promise<SerpAnswer> {
   const apiKey = Deno.env.get("SERPAPI_API_KEY");
   if (!apiKey) throw new Error("SERPAPI_API_KEY is not configured");
@@ -283,6 +369,8 @@ export async function googleSearch(
   url.searchParams.set("engine", "google");
   url.searchParams.set("q", query);
   url.searchParams.set("num", String(num));
+  url.searchParams.set("gl", "ae");
+  url.searchParams.set("hl", "en");
   if (NEWS_INTENT.test(question)) url.searchParams.set("tbm", "nws");
   url.searchParams.set("api_key", apiKey);
 
@@ -326,13 +414,7 @@ export async function googleSearch(
 
   const ranked = [...candidates].sort((a, b) => score(b) - score(a));
 
-  const answerText =
-    asText(payload.answer_box?.answer) ||
-    asText(payload.answer_box?.snippet) ||
-    asText(payload.knowledge_graph?.description) ||
-    asText(ranked[0]?.snippet) ||
-    asText(ranked[0]?.title) ||
-    "No direct market filing found for that specific query.";
+  const { text: answerText, source: answerSource } = pickAnswer(payload, ranked, keywords);
 
   const results = ranked.slice(0, 3).map((item) => ({
     title: item.title ?? item.link!,
@@ -340,5 +422,5 @@ export async function googleSearch(
     url: item.link!,
   }));
 
-  return { query, answerText, results };
+  return { query, answerText, answerSource, results };
 }

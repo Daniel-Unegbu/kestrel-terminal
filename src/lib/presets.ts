@@ -5,13 +5,13 @@ import type { DossierSource, InstitutionalDossier } from "./dossier";
 // entity-specific filings, and are labelled REFERENCE in the UI.
 
 const REF = {
-  fabIr: {
-    title: "FAB Investor Relations — financial results & disclosures",
+  ir: {
+    title: "Investor Relations — financial results & disclosures",
     url: "https://www.bankfab.com/en-ae/about-fab/investor-relations",
     provider: "REFERENCE" as const,
   },
-  fabSustain: {
-    title: "FAB Sustainability — sustainable finance commitments",
+  sustain: {
+    title: "Sustainability — sustainable finance commitments",
     url: "https://www.bankfab.com/en-ae/about-fab/sustainability",
     provider: "REFERENCE" as const,
   },
@@ -60,9 +60,9 @@ export const PRESET_DOSSIERS: Array<InstitutionalDossier & { slug: string }> = [
     segment: "GRE_SOVEREIGN",
     lastUpdatedIso: now,
     executiveSummary:
-      "State-backed developer scaling 4.2 GW of solar-plus-storage across Central Asia and Indonesia while expanding two container terminals on the Gulf–Asia corridor. Capex peaks in 2027, creating project finance syndication, multi-currency escrow and green sukuk windows aligned with FAB's sustainable finance commitments.",
+      "State-backed developer scaling 4.2 GW of solar-plus-storage across Central Asia and Indonesia while expanding two container terminals on the Gulf–Asia corridor. Capex peaks in 2027, creating project finance syndication, multi-currency escrow and green sukuk windows aligned with sustainable finance commitments.",
     executiveBriefAudioScript:
-      "Good morning. Ahead of your coverage meeting with Saraya Clean Energy and Ports, three capital triggers stand out. First, capex peaks in 2027 at roughly AED 6.8 billion across Uzbekistan and Indonesia, and the project finance stack is still open, so Global Corporate Finance should position for lead arranger on the next syndication. Second, about AED 1.9 billion of sukuk matures in 2028; with sovereign support and a green use of proceeds, a refinancing green sukuk fits FAB's number-one MENA bonds and sukuk franchise. Third, revenues accrue in Uzbek som and rupiah against dollar debt, so Global Markets should lead an FX hedging programme. Credit is low risk with net debt to EBITDA at 3.4 times, typical for contracted infrastructure. Lead with green sukuk and escrow.",
+      "Good morning. Ahead of your coverage meeting with Saraya Clean Energy and Ports, three capital triggers stand out. First, capex peaks in 2027 at roughly AED 6.8 billion across Uzbekistan and Indonesia, and the project finance stack is still open, so Global Corporate Finance should position for lead arranger on the next syndication. Second, about AED 1.9 billion of sukuk matures in 2028; with sovereign support and a green use of proceeds, a refinancing green sukuk fits the bank's leading MENA bonds and sukuk franchise. Third, revenues accrue in Uzbek som and rupiah against dollar debt, so Global Markets should lead an FX hedging programme. Credit is low risk with net debt to EBITDA at 3.4 times, typical for contracted infrastructure. Lead with green sukuk and escrow.",
     financialMetrics: {
       estimatedRevenueAED: "AED 7.4B",
       ebitdaMarginPct: 58,
@@ -103,7 +103,7 @@ export const PRESET_DOSSIERS: Array<InstitutionalDossier & { slug: string }> = [
         sourceRefs: [1, 2],
       },
       {
-        division: "FAB Siraj Islamic Banking",
+        division: "Islamic Banking",
         recommendedProduct: "Green sukuk refinancing",
         triggerSignal: "AED 1.9B sukuk maturing 2028",
         estimatedFeePoolAED: "AED 14M",
@@ -131,8 +131,8 @@ export const PRESET_DOSSIERS: Array<InstitutionalDossier & { slug: string }> = [
         category: "ESG / Transition Finance",
         severity: "INFO",
         finding: "Use-of-proceeds qualifies under green finance framework; eligible for sustainable finance targets.",
-        sourceTitle: REF.fabSustain.title,
-        sourceUrl: REF.fabSustain.url,
+        sourceTitle: REF.sustain.title,
+        sourceUrl: REF.sustain.url,
         searchProvider: "REFERENCE",
       },
       {
@@ -152,7 +152,7 @@ export const PRESET_DOSSIERS: Array<InstitutionalDossier & { slug: string }> = [
         searchProvider: "REFERENCE",
       },
     ],
-    sources: [REF.fabIr, REF.fabSustain, REF.irena, REF.cbuae, REF.bis],
+    sources: [REF.ir, REF.sustain, REF.irena, REF.cbuae, REF.bis],
   },
   {
     slug: "al-rimal-industrial-group",
@@ -221,7 +221,7 @@ export const PRESET_DOSSIERS: Array<InstitutionalDossier & { slug: string }> = [
         confidenceScore: 72,
       },
       {
-        division: "FAB Siraj Islamic Banking",
+        division: "Islamic Banking",
         recommendedProduct: "Murabaha working capital line (KSA)",
         triggerSignal: "Saudi plant expansion",
         estimatedFeePoolAED: "AED 4M",
@@ -254,7 +254,7 @@ export const PRESET_DOSSIERS: Array<InstitutionalDossier & { slug: string }> = [
         searchProvider: "REFERENCE",
       },
     ],
-    sources: [REF.fabIr, REF.cbuae, REF.bis, REF.ofac],
+    sources: [REF.ir, REF.cbuae, REF.bis, REF.ofac],
   },
   {
     slug: "northgate-asset-management-adgm",
@@ -323,7 +323,7 @@ export const PRESET_DOSSIERS: Array<InstitutionalDossier & { slug: string }> = [
         confidenceScore: 71,
       },
       {
-        division: "FAB Siraj Islamic Banking",
+        division: "Islamic Banking",
         recommendedProduct: "Shariah-compliant fund share class banking",
         triggerSignal: "GCC LP demand for Islamic sleeve",
         estimatedFeePoolAED: "AED 2M",
@@ -348,7 +348,7 @@ export const PRESET_DOSSIERS: Array<InstitutionalDossier & { slug: string }> = [
         searchProvider: "REFERENCE",
       },
     ],
-    sources: [REF.fabIr, REF.adgm, REF.ofac, REF.bis],
+    sources: [REF.ir, REF.adgm, REF.ofac, REF.bis],
   },
   {
     slug: "souqline-commerce",
@@ -362,7 +362,7 @@ export const PRESET_DOSSIERS: Array<InstitutionalDossier & { slug: string }> = [
     executiveSummary:
       "Fast-growing UAE marketplace (≈ 3x GMV in two years) expanding into KSA. Card-settlement delays and seasonal inventory build lock up working capital; the founder-led finance team still runs cash management manually.",
     executiveBriefAudioScript:
-      "Good morning. Ahead of your meeting with Souqline Commerce, three triggers stand out. Gross merchandise value has roughly tripled in two years and the business is entering Saudi Arabia, so a scalable working capital line is overdue. Second, card settlements lag by about 30 days and Ramadan inventory builds stretch the cash cycle to 58 days, which is exactly what automated receivables finance on the FAB Business Portal solves. Third, the finance team still reconciles payouts manually, so digital cash management and merchant acquiring from Global Transaction Banking add sticky fee income. Credit is moderate watch given thin margins. Lead with the working capital line and portal onboarding.",
+      "Good morning. Ahead of your meeting with Souqline Commerce, three triggers stand out. Gross merchandise value has roughly tripled in two years and the business is entering Saudi Arabia, so a scalable working capital line is overdue. Second, card settlements lag by about 30 days and Ramadan inventory builds stretch the cash cycle to 58 days, which is exactly what automated receivables finance on the Business Portal solves. Third, the finance team still reconciles payouts manually, so digital cash management and merchant acquiring from Global Transaction Banking add sticky fee income. Credit is moderate watch given thin margins. Lead with the working capital line and portal onboarding.",
     financialMetrics: {
       estimatedRevenueAED: "AED 410M",
       ebitdaMarginPct: 6.8,
@@ -434,7 +434,7 @@ export const PRESET_DOSSIERS: Array<InstitutionalDossier & { slug: string }> = [
         searchProvider: "REFERENCE",
       },
     ],
-    sources: [REF.fabIr, REF.moec, REF.cbuae, REF.bis],
+    sources: [REF.ir, REF.moec, REF.cbuae, REF.bis],
   },
 ];
 

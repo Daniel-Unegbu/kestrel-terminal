@@ -11,7 +11,7 @@ export type FabDivision =
   | "Global Corporate Finance"
   | "Global Transaction Banking"
   | "Global Markets"
-  | "FAB Siraj Islamic Banking";
+  | "Islamic Banking";
 export type RadarCategory =
   | "CBUAE / Regulatory"
   | "Sanctions & Adverse Media"

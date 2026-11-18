@@ -16,7 +16,7 @@ export const Route = createFileRoute("/roi-model")({
       { title: "Wholesale Mandate & Fee-Income Simulator — Kestrel Terminal" },
       {
         name: "description",
-        content: "Model RM capacity reclaimed, incremental non-interest fee income and 90-day pilot break-even for FAB Wholesale Banking and IB&M.",
+        content: "Model RM capacity reclaimed, incremental non-interest fee income and 90-day pilot break-even for wholesale banking and IB&M teams.",
       },
       { property: "og:title", content: "Wholesale Mandate & Fee-Income Simulator — Kestrel Terminal" },
       { property: "og:description", content: "How many incremental mandates pay back the platform? Model it live." },
@@ -64,7 +64,7 @@ function RoiModel() {
           <div className="eyebrow">Pillar 5 · Commercial impact</div>
           <h1 className="mt-2 text-3xl font-semibold">Wholesale Mandate & Fee-Income Simulator</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Non-interest fee and spread income drives 43% of FAB's operating income. Move the levers to see what faster,
+            Non-interest fee and spread income drives 43% of a wholesale bank's operating income. Move the levers to see what faster,
             better-prepared coverage is worth.
           </p>
         </div>
@@ -170,8 +170,8 @@ function RoiModel() {
           <div id="term-sheet" className="space-y-4 text-sm">
             <div className="flex items-start justify-between border-b border-border pb-3">
               <div>
-                <div className="font-semibold">Kestrel Terminal × First Abu Dhabi Bank</div>
-                <div className="text-xs text-muted-foreground">Prepared for FAB Innovation committee review</div>
+                <div className="font-semibold">Kestrel Terminal × Wholesale Banking</div>
+                <div className="text-xs text-muted-foreground">Prepared for innovation committee review</div>
               </div>
               <div className="num text-right text-[11px] text-muted-foreground">
                 {saved ? (
@@ -185,7 +185,7 @@ function RoiModel() {
             </div>
             <Section title="Scope">
               Proof-of-value for {Math.min(35, inputs.rmCount)} Wholesale Banking RMs over {ROI_ASSUMPTIONS.pilotDays} days,
-              deployed as containers inside FAB's Microsoft Azure UAE North tenant behind a single governed AI gateway.
+              deployed as containers inside a Microsoft Azure UAE North tenant behind a single governed AI gateway.
             </Section>
             <table className="w-full text-sm">
               <tbody>

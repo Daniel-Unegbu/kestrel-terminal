@@ -8,7 +8,7 @@ import { useTerminal } from "./terminal-context";
 
 type Phase = "idle" | "recording" | "transcribing" | "thinking" | "speaking";
 
-const SUGGESTED = "What are the top two refinancing or FX risks for this client, and which FAB division should lead?";
+const SUGGESTED = "What are the top two refinancing or FX risks for this client, and which division should lead?";
 
 function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {

@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
       { title: "Command Center — Kestrel Terminal" },
       {
         name: "description",
-        content: "Macro telemetry and the coverage bottleneck across FAB's 20-market footprint, with the live research pipeline that resolves it.",
+        content: "Macro telemetry and the coverage bottleneck across a 20-market footprint, with the live research pipeline that resolves it.",
       },
       { property: "og:title", content: "Command Center — Kestrel Terminal" },
       {
@@ -24,11 +24,11 @@ export const Route = createFileRoute("/")({
 });
 
 const KPIS = [
-  { label: "Group assets", value: "AED 1.47T", sub: "9M 2026" },
-  { label: "Operating income", value: "AED 29.71B", sub: "9M 2026" },
-  { label: "Non-interest income mix", value: "43%", sub: "fees & spread" },
-  { label: "RoTE", value: "18.6%", sub: "CET1 14.0%" },
-  { label: "Int'l franchise revenue", value: "+31%", sub: "YoY growth" },
+  { label: "DFM market cap", value: "AED 0.86T", sub: "listed equities" },
+  { label: "ADX market cap", value: "AED 2.94T", sub: "listed equities" },
+  { label: "Banking sector weight", value: "28.5%", sub: "of benchmark" },
+  { label: "Average daily turnover", value: "AED 1.2B", sub: "DFM + ADX" },
+  { label: "Foreign inflow", value: "+18%", sub: "YoY" },
 ];
 
 const NODES = [
@@ -46,7 +46,7 @@ const NODES = [
     ring: "border-gold/50",
     eyebrow: "02 · Synthesis",
     title: "Sovereign gateway synthesis",
-    body: "One governed orchestration core over FAB-approved models — repointable to Azure OpenAI in UAE North.",
+    body: "One governed orchestration core over approved models — repointable to Azure OpenAI in UAE North.",
   },
   {
     icon: AudioLines,
@@ -79,7 +79,7 @@ function CommandCenter() {
             Walk into every client meeting with the <span className="text-gold-gradient">capital triggers</span> already mapped.
           </h1>
           <p className="mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">
-            Kestrel turns live market intelligence into cited coverage dossiers for FAB's Wholesale Banking and IB&M teams —
+            Kestrel turns live market intelligence into cited coverage dossiers for wholesale banking and IB&M teams —
             routed to the division that should lead, and briefed aloud in sixty seconds.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
@@ -175,7 +175,7 @@ function CommandCenter() {
       {/* Pillars */}
       <section className="mt-14">
         <div className="eyebrow">Evaluation map</div>
-        <h2 className="mt-2 text-2xl font-semibold">Every view answers one of FAB Innovation's five pillars</h2>
+        <h2 className="mt-2 text-2xl font-semibold">Every view answers one of the five innovation pillars</h2>
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {PILLARS.map((p) => (
             <Link key={p.n} to={p.to} className="panel group p-4 transition-colors hover:border-gold/40">

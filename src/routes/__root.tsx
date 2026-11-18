@@ -11,6 +11,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { UAE_MARKET_COPY } from "../lib/fab-references";
 import { Toaster } from "@/components/ui/sonner";
 import { AppHeader } from "@/components/terminal/app-header";
 import { CommandPalette } from "@/components/terminal/command-palette";
@@ -87,7 +88,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Kestrel Terminal — Institutional Coverage & Deal Intelligence" },
       {
         name: "description",
-        content: "Institutional capital markets terminal for FAB relationship managers: cited client dossiers, voice briefs and fee-income modelling.",
+        content: "Institutional capital markets terminal for relationship managers: cited client dossiers, voice briefs and fee-income modelling.",
       },
       { name: "author", content: "Kestrel Terminal" },
       { property: "og:title", content: "Kestrel Terminal — Institutional Coverage & Deal Intelligence" },
@@ -148,8 +149,8 @@ function RootComponent() {
           </main>
           <footer className="border-t border-border no-print">
             <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-2 px-4 py-4 text-[11px] text-muted-foreground lg:px-6">
-              <span>Kestrel Terminal · Institutional coverage prototype for First Abu Dhabi Bank</span>
-              <span className="num">Figures: FAB 9M 2026 disclosures · Preset clients are illustrative</span>
+              <span>Kestrel Terminal · Institutional coverage & deal intelligence prototype</span>
+              <span className="num">{UAE_MARKET_COPY.footerFigures}</span>
             </div>
           </footer>
         </div>
