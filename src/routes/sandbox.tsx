@@ -11,7 +11,10 @@ import { SEGMENTS, type InstitutionalDossier } from "@/lib/dossier";
 import { findPreset, PRESET_DOSSIERS } from "@/lib/presets";
 import { getDossier, listRecentDossiers, runResearch } from "@/lib/research.functions";
 
-const recentQuery = queryOptions({ queryKey: ["recent-dossiers"], queryFn: () => listRecentDossiers() });
+const recentQuery = queryOptions({
+  queryKey: ["recent-dossiers"],
+  queryFn: () => listRecentDossiers(),
+});
 
 export const Route = createFileRoute("/sandbox")({
   validateSearch: (s: Record<string, unknown>): { entity?: string; focus?: string } => ({
@@ -21,13 +24,17 @@ export const Route = createFileRoute("/sandbox")({
   loader: ({ context }) => context.queryClient.ensureQueryData(recentQuery),
   head: () => ({
     meta: [
-      { title: "Coverage & Credit Research Sandbox — Kestrel Terminal" },
+      { title: "IS Audit & Governance Sandbox — Kestrel Terminal" },
       {
         name: "description",
-        content: "Generate cited institutional banking dossiers for GREs, corporates, financial institutions and SMEs — with debt walls, FX corridors and division routing.",
+        content:
+          "Generate cited IS audit dossiers for Ethiopian public sector systems, financial core platforms, telecom and cloud services, and enterprise ERP — with control gaps, remediation roadmaps and EISAA pillar routing.",
       },
-      { property: "og:title", content: "Coverage & Credit Research Sandbox — Kestrel Terminal" },
-      { property: "og:description", content: "Cited banking dossiers in seconds, routed to the division that should lead." },
+      { property: "og:title", content: "IS Audit & Governance Sandbox — Kestrel Terminal" },
+      {
+        property: "og:description",
+        content: "Cited audit dossiers in seconds, routed to the EISAA pillar that should lead.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -82,7 +89,7 @@ function Sandbox() {
     return () => timers.forEach(clearTimeout);
   }, [loading]);
 
-  const activeSegment = current?.dossier.segment ?? "IBM_CORPORATE";
+  const activeSegment = current?.dossier.segment ?? "PUBLIC_SECTOR_INFRA";
 
   const runSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,7 +103,9 @@ function Sandbox() {
       return;
     }
     setLive({ slug: res.slug, dossier: res.dossier });
-    toast.success(`Dossier ready · ${res.sourceCount} sources · ${(res.elapsedMs / 1000).toFixed(1)}s`);
+    toast.success(
+      `Dossier ready · ${res.sourceCount} sources · ${(res.elapsedMs / 1000).toFixed(1)}s`,
+    );
     void qc.invalidateQueries({ queryKey: ["recent-dossiers"] });
     void navigate({ search: { entity: res.slug } });
   };
@@ -105,8 +114,8 @@ function Sandbox() {
     <div className="mx-auto max-w-[1440px] px-4 py-6 lg:px-6 lg:py-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className="eyebrow">Pillar 2 · Wholesale Banking & IB&M</div>
-          <h1 className="mt-2 text-3xl font-semibold">Coverage & Credit Research Sandbox</h1>
+          <div className="eyebrow">Pillar 2 · IS Audit, IT Governance & Cyber Risk</div>
+          <h1 className="mt-2 text-3xl font-semibold">IS Audit & Governance Sandbox</h1>
         </div>
       </div>
 
@@ -114,7 +123,8 @@ function Sandbox() {
       <div className="mt-6 flex gap-1 overflow-x-auto border-b border-border">
         {SEGMENTS.map((s) => {
           const p = PRESET_DOSSIERS.find((d) => d.segment === s.id)!;
-          const active = preset?.segment === s.id || (!preset && activeSegment === s.id && !!current);
+          const active =
+            preset?.segment === s.id || (!preset && activeSegment === s.id && !!current);
           return (
             <button
               key={s.id}
@@ -124,7 +134,11 @@ function Sandbox() {
               <div className="text-sm font-medium">{s.label}</div>
               <div className="mt-0.5 text-[11px] text-muted-foreground">{p.entityName}</div>
               {active && (
-                <motion.span layoutId="segment-underline" className="absolute inset-x-0 -bottom-px h-0.5 bg-gold" transition={{ type: "spring", stiffness: 500, damping: 40 }} />
+                <motion.span
+                  layoutId="segment-underline"
+                  className="absolute inset-x-0 -bottom-px h-0.5 bg-gold"
+                  transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                />
               )}
             </button>
           );
@@ -139,13 +153,18 @@ function Sandbox() {
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Live entity search — e.g. Aldar Properties, ADNOC Gas, Emirates NBD, Masdar"
+            placeholder="Live system search — e.g. National Digital ID, Ethio Telecom, Addis interbank switch, Customs ERP"
             className="h-10 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             maxLength={120}
           />
           <label className="hidden cursor-pointer items-center gap-2 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground sm:flex">
-            <input type="checkbox" checked={deep} onChange={(e) => setDeep(e.target.checked)} className="accent-[var(--color-gold)]" />
-            Deep synthesis <span className="num text-[10px]">(Pro)</span>
+            <input
+              type="checkbox"
+              checked={deep}
+              onChange={(e) => setDeep(e.target.checked)}
+              className="accent-[var(--color-gold)]"
+            />
+            Deep audit synthesis <span className="num text-[10px]">(refresh)</span>
           </label>
           <button
             type="submit"
@@ -181,7 +200,7 @@ function Sandbox() {
           <DossierSkeleton stage={3} />
         ) : (
           <div className="panel p-10 text-center text-muted-foreground">
-            That dossier isn't available. Pick a segment above or run a live search.
+            That audit dossier isn't available. Pick a segment above or run a live system search.
           </div>
         )}
       </div>

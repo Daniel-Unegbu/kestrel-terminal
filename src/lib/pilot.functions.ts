@@ -3,7 +3,7 @@ import type { RoiInputs } from "./roi";
 
 export type PilotSimulationResult = { ok: true; id: string; createdAt: string } | { ok: false };
 
-/** Persists an ROI run through the `pilot-simulation` Edge Function. */
+/** Persists an audit-impact run through the `pilot-simulation` Edge Function. */
 export const savePilotSimulation = async ({
   data,
 }: {

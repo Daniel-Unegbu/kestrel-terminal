@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Building2, Calculator, LayoutDashboard, Mic, Network, Search } from "lucide-react";
+import { Calculator, Landmark, LayoutDashboard, Mic, Network, Search } from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -36,17 +36,17 @@ export function CommandPalette() {
 
   return (
     <CommandDialog open={paletteOpen} onOpenChange={setPaletteOpen}>
-      <CommandInput placeholder="Search dossiers, views, actions…" />
+      <CommandInput placeholder="Search audit dossiers, views, actions…" />
       <CommandList>
         <CommandEmpty>No match.</CommandEmpty>
-        <CommandGroup heading="UAE corporate dossiers">
+        <CommandGroup heading="Ethiopian IS audit dossiers">
           {PRESET_DOSSIERS.map((d) => (
             <CommandItem
               key={d.slug}
               value={`${d.entityName} ${d.sector}`}
               onSelect={() => go(() => navigate({ to: "/sandbox", search: { entity: d.slug } }))}
             >
-              <Building2 className="text-gold" />
+              <Landmark className="text-gold" />
               <span className="flex-1">{d.entityName}</span>
               <span className="num text-[10px] text-muted-foreground">
                 {SEGMENTS.find((s) => s.id === d.segment)?.short}
@@ -56,14 +56,20 @@ export function CommandPalette() {
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Actions">
-          <CommandItem value="live entity search research" onSelect={() => go(() => navigate({ to: "/sandbox", search: { focus: "search" } }))}>
-            <Search className="text-azure" /> Live entity search
+          <CommandItem
+            value="live system search research"
+            onSelect={() => go(() => navigate({ to: "/sandbox", search: { focus: "search" } }))}
+          >
+            <Search className="text-azure" /> Live system search
           </CommandItem>
-          <CommandItem value="voice copilot deal desk" onSelect={() => go(() => setDeskOpen(true))}>
-            <Mic className="text-azure" /> Toggle Deal Desk voice copilot
+          <CommandItem value="voice copilot auditdesk" onSelect={() => go(() => setDeskOpen(true))}>
+            <Mic className="text-azure" /> Toggle AuditDesk voice copilot
           </CommandItem>
-          <CommandItem value="roi simulator wholesale" onSelect={() => go(() => navigate({ to: "/roi-model" }))}>
-            <Calculator className="text-emerald" /> Open Wholesale ROI Simulator
+          <CommandItem
+            value="is audit capacity risk simulator"
+            onSelect={() => go(() => navigate({ to: "/roi-model" }))}
+          >
+            <Calculator className="text-emerald" /> Open IS Audit Capacity Simulator
           </CommandItem>
         </CommandGroup>
         <CommandSeparator />
@@ -71,8 +77,11 @@ export function CommandPalette() {
           <CommandItem value="command center home" onSelect={() => go(() => navigate({ to: "/" }))}>
             <LayoutDashboard /> Command Center
           </CommandItem>
-          <CommandItem value="architecture sovereign azure" onSelect={() => go(() => navigate({ to: "/architecture" }))}>
-            <Network /> Sovereign architecture
+          <CommandItem
+            value="architecture sovereign governance"
+            onSelect={() => go(() => navigate({ to: "/architecture" }))}
+          >
+            <Network /> Sovereign audit architecture
           </CommandItem>
         </CommandGroup>
       </CommandList>

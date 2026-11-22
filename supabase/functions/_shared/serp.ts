@@ -38,7 +38,7 @@ interface SerpPayload {
 }
 
 /**
- * Question words, connectives and DealDesk-specific vocabulary. Google returns
+ * Question words, connectives and AuditDesk-specific vocabulary. Google returns
  * brand homepages for long conversational sentences, so only the substantive
  * terms are forwarded.
  */
@@ -69,9 +69,12 @@ const STOPWORDS = new Set([
   "but",
   "by",
   "can",
-  "client",
-  "clients",
-  "company",
+  "audit",
+  "audited",
+  "auditor",
+  "auditors",
+  "control",
+  "controls",
   "could",
   "did",
   "do",
@@ -80,8 +83,9 @@ const STOPWORDS = new Set([
   "down",
   "during",
   "each",
-  "entity",
   "few",
+  "finding",
+  "findings",
   "for",
   "from",
   "further",
@@ -183,7 +187,12 @@ const STOPWORDS = new Set([
   "yours",
   "division",
   "divisions",
-  "fab",
+  "pillar",
+  "pillars",
+  "system",
+  "systems",
+  "risk",
+  "risks",
 ]);
 
 const MAX_KEYWORDS = 6;
@@ -192,27 +201,26 @@ const MAX_KEYWORDS = 6;
  * "risk" questions replaces Google's answer box with bare headlines. */
 const NEWS_INTENT = /\b(news|latest|recent|today|this week|update|announcement|announced)\b/i;
 
-/** Reputable outlets first; forums and lead-gen blogs last. */
+/** Regulators, standards bodies and reputable outlets first; forums last. */
 const AUTHORITATIVE = [
-  "reuters.com",
-  "bloomberg.com",
-  "ft.com",
-  "wsj.com",
-  "thenationalnews.com",
-  "gulfnews.com",
-  "khaleejtimes.com",
-  "zawya.com",
-  "spglobal.com",
-  "moodys.com",
-  "fitchratings.com",
-  "msci.com",
-  "bankfab.com",
-  "centralbank.ae",
-  "dfm.ae",
-  "adx.ae",
-  "imf.org",
+  "insa.gov.et",
+  "ecysa.gov.et",
+  "nbe.gov.et",
+  "egov.et",
+  "customs.gov.et",
+  "moj.gov.et",
+  "ethiotelecom.et",
+  "isaca.org",
+  "iso.org",
+  "iia.global",
+  "itu.int",
   "worldbank.org",
-  "bis.org",
+  "imf.org",
+  "afdb.org",
+  "reuters.com",
+  "ft.com",
+  "thereporterethiopia.com",
+  "addisstandard.com",
 ];
 
 const LOW_QUALITY = [
@@ -348,12 +356,12 @@ function pickAnswer(
   const top = asText(best?.snippet) || asText(best?.title);
   if (top) return { text: top, source: "organic" };
 
-  return { text: "No direct market filing found for that specific query.", source: "none" };
+  return { text: "No direct audit source found for that specific query.", source: "none" };
 }
 
 /**
  * Google native search through SerpAPI. The answer is read straight out of the
- * payload — no LLM is involved in the Deal Desk path.
+ * payload — no LLM is involved in the AuditDesk path.
  */
 export async function googleSearch(
   entityName: string,
@@ -369,7 +377,7 @@ export async function googleSearch(
   url.searchParams.set("engine", "google");
   url.searchParams.set("q", query);
   url.searchParams.set("num", String(num));
-  url.searchParams.set("gl", "ae");
+  url.searchParams.set("gl", "et");
   url.searchParams.set("hl", "en");
   if (NEWS_INTENT.test(question)) url.searchParams.set("tbm", "nws");
   url.searchParams.set("api_key", apiKey);

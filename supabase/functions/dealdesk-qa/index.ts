@@ -19,7 +19,7 @@ const inputSchema = z.object({
 /**
  * dealdesk-qa: Deepgram Nova speech-to-text + SerpAPI Google search.
  * No Gemini call happens on this path — the answer is read out of the search
- * payload, or assembled from the client dossier when SerpAPI has no answer.
+ * payload, or assembled from the system dossier when SerpAPI has no answer.
  */
 
 /** Bad or missing dossier JSON degrades to SerpAPI rather than failing the call. */
@@ -89,12 +89,12 @@ Deno.serve(async (req) => {
 
     if (transcribeOnly) return json({ ok: true, transcript }, 200, cors);
 
-    const leadDivision = (dossier?.fabDivisionRouting ?? [])
-      .filter((item) => !!item.division)
-      .sort((a, b) => (b.confidenceScore ?? 0) - (a.confidenceScore ?? 0))[0]?.division;
+    const leadPillar = (dossier?.eisaaPillarRouting ?? [])
+      .filter((item) => !!item.pillar)
+      .sort((a, b) => (b.confidenceScore ?? 0) - (a.confidenceScore ?? 0))[0]?.pillar;
 
-    // Questions about *this* client's file ("which division leads?", "top
-    // risks?") have no web answer box. Assemble them from the researched
+    // Questions about *this* system's audit file ("which pillar leads?", "top
+    // control gaps?") have no web answer box. Assemble them from the researched
     // dossier and skip SerpAPI entirely.
     const composed = composeDealDeskAnswer(transcript, dossier);
     if (composed) {
@@ -106,7 +106,7 @@ Deno.serve(async (req) => {
           answerText: composed.answerText,
           spokenText: composed.spokenText,
           answerSource: "dossier",
-          leadDivision,
+          leadPillar,
           sourceUrls: composed.sourceUrls,
           results: [],
         },
@@ -127,7 +127,7 @@ Deno.serve(async (req) => {
         query,
         answerText,
         answerSource,
-        leadDivision,
+        leadPillar,
         sourceUrls: [],
         results,
       },

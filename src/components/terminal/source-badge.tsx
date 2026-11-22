@@ -1,7 +1,13 @@
 import type { DossierSource } from "@/lib/dossier";
 import { PROVIDER_LABEL } from "@/lib/dossier";
 
-export function SourceBadges({ refs, sources }: { refs?: number[] | undefined; sources: DossierSource[] }) {
+export function SourceBadges({
+  refs,
+  sources,
+}: {
+  refs?: number[] | undefined;
+  sources: DossierSource[];
+}) {
   if (!refs?.length) return null;
   return (
     <span className="inline-flex flex-wrap gap-1">

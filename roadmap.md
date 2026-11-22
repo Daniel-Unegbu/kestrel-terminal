@@ -1,10 +1,10 @@
 # Kestrel Terminal roadmap
-- [ ] Design system (obsidian/gold terminal palette, Plus Jakarta Sans + JetBrains Mono)
-- [ ] Shell: macro telemetry strip, segment nav, Cmd+K palette
-- [ ] / Command Center (problem thesis, 3-node flow)
-- [ ] /sandbox: 4 preset segment dossiers + live entity search (Tavily → SerpAPI fallback → Gemini), saved to Cloud
-- [ ] 6 research modules with source badges
-- [ ] 60s RM Audio Brief (Deepgram Aura, browser voice fallback)
-- [ ] Ask the Deal Desk push-to-talk (Deepgram Nova, typed fallback)
-- [ ] /roi-model simulator + pilot term sheet export (saved to Cloud) + tests
-- [ ] /architecture sovereign topology, compliance matrix, PoV roadmap
+- [x] Design system (obsidian/gold terminal palette, Plus Jakarta Sans + JetBrains Mono)
+- [x] Shell: EISAA governance telemetry strip, segment nav, Cmd+K palette
+- [x] / Command Center (problem thesis, 3-node flow)
+- [x] /sandbox: 4 Ethiopian IS audit preset dossiers + live system search (Research Agent → Search Agent fallback → synthesis), saved to Internal Database
+- [x] 6 audit modules with source badges
+- [x] 60s Lead Auditor Audio Brief (Voice Agent, browser voice fallback)
+- [x] Ask the AuditDesk push-to-talk (Voice Agent speech-to-text, typed fallback)
+- [x] /roi-model IS audit capacity & risk-mitigation simulator + pilot charter export (saved to Internal Database) + tests
+- [x] /architecture sovereign audit topology, INSA / Proclamation compliance matrix, member pilot roadmap

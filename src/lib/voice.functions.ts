@@ -4,7 +4,7 @@ export type TtsResult =
   { ok: true; audioBase64: string; mime: string } | { ok: false; error: string };
 
 export type DealDeskAnswer =
-  | { ok: true; answer: string; spoken: string; leadDivision: string; sourceRefs: number[] }
+  | { ok: true; answer: string; spoken: string; leadPillar: string; sourceRefs: number[] }
   | { ok: false; error: string };
 
 interface DealDeskQaResponse {
@@ -13,7 +13,7 @@ interface DealDeskQaResponse {
   answerText?: string;
   spokenText?: string;
   answerSource?: string;
-  leadDivision?: string;
+  leadPillar?: string;
   sourceUrls?: string[];
   results?: Array<{ title: string; snippet: string; url: string }>;
   error?: string;
@@ -21,7 +21,7 @@ interface DealDeskQaResponse {
 
 interface DossierLite {
   entityName?: string;
-  fabDivisionRouting?: Array<{ division?: string }>;
+  eisaaPillarRouting?: Array<{ pillar?: string }>;
   sources?: Array<{ url?: string }>;
 }
 
@@ -62,7 +62,7 @@ export const synthesizeSpeech = async ({
 };
 
 /**
- * Deepgram Nova transcription. The Deal Desk UI transcribes first, then asks,
+ * Deepgram Nova transcription. The AuditDesk UI transcribes first, then asks,
  * so this calls dealdesk-qa in transcribe-only mode (it is the only function
  * that touches Deepgram speech-to-text).
  */
@@ -86,9 +86,9 @@ export const transcribeAudio = async ({
 };
 
 /**
- * dealdesk-qa: dossier answers for client-file questions, SerpAPI Google search
+ * dealdesk-qa: dossier answers for audit-file questions, SerpAPI Google search
  * for everything else (no Gemini). The edge function returns a single answer
- * plus the lead division and source URLs; those map onto the UI's shape.
+ * plus the lead EISAA pillar and source URLs; those map onto the UI's shape.
  */
 export const askDealDesk = async ({
   data,
@@ -115,7 +115,7 @@ export const askDealDesk = async ({
         error:
           res?.error === "search-failed"
             ? "The Search Agent couldn't reach the market right now. Please try again."
-            : "The Deal Desk couldn't answer right now. Please try again.",
+            : "The AuditDesk couldn't answer right now. Please try again.",
       };
     }
 
@@ -129,18 +129,18 @@ export const askDealDesk = async ({
       ok: true,
       answer: res.answerText,
       spoken: res.spokenText ?? firstSentences(res.answerText),
-      leadDivision:
-        res.leadDivision ?? dossier.fabDivisionRouting?.[0]?.division ?? "Global Corporate Finance",
+      leadPillar:
+        res.leadPillar ?? dossier.eisaaPillarRouting?.[0]?.pillar ?? "Pre-Development System Audit",
       sourceRefs,
     };
   } catch (error) {
-    console.error("Deal desk failed", error);
+    console.error("AuditDesk failed", error);
     const detail = error instanceof Error ? error.message : "";
     return {
       ok: false,
       error: detail
-        ? `The Deal Desk couldn't answer right now (${detail}). Please try again.`
-        : "The Deal Desk couldn't answer right now. Please try again.",
+        ? `The AuditDesk couldn't answer right now (${detail}). Please try again.`
+        : "The AuditDesk couldn't answer right now. Please try again.",
     };
   }
 };

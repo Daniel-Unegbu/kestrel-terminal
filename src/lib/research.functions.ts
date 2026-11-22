@@ -69,7 +69,8 @@ export const listRecentDossiers = async (): Promise<
 
 /**
  * Reads a saved dossier directly from PostgREST and normalises provider names
- * stored by older versions of the app.
+ * stored by older versions of the app. Payloads written before `schemaVersion`
+ * 2 are treated as missing so the caller re-runs the research pipeline.
  */
 export const getDossier = async ({
   data,
@@ -86,6 +87,8 @@ export const getDossier = async ({
     if (error || !row) return null;
 
     const payload = row.dossier_payload as unknown as InstitutionalDossier;
+    if (payload?.schemaVersion !== 2) return null;
+
     const provider = (value: string) =>
       (value === "TAVILY" ? "RESEARCH" : value === "SERPAPI" ? "SEARCH" : value) as SearchProvider;
 
@@ -96,7 +99,7 @@ export const getDossier = async ({
         ...source,
         provider: provider(source.provider),
       })),
-      complianceAndRiskRadar: (payload.complianceAndRiskRadar ?? []).map((item) => ({
+      governanceRiskRadar: (payload.governanceRiskRadar ?? []).map((item) => ({
         ...item,
         searchProvider: provider(item.searchProvider),
       })),

@@ -8,11 +8,14 @@ import { retrieve, synthesize } from "../_shared/research.ts";
 import { adminClient } from "../_shared/supabase.ts";
 
 const SEGMENTS = [
-  "GRE_SOVEREIGN",
-  "IBM_CORPORATE",
-  "FINANCIAL_INSTITUTION",
-  "COMMERCIAL_SME",
+  "PUBLIC_SECTOR_INFRA",
+  "FINANCIAL_CORE_SYSTEMS",
+  "TELECOM_CLOUD_ITSM",
+  "ENTERPRISE_ERP_GOV",
 ] as const;
+
+/** Bumped whenever the dossier payload shape changes; older rows are a cache miss. */
+const DOSSIER_SCHEMA_VERSION = 2;
 
 const inputSchema = z.object({
   query: z.string().trim().min(2).max(120).optional(),
@@ -60,18 +63,22 @@ Deno.serve(async (req) => {
       if (cacheError) console.error("Dossier cache lookup failed", cacheError.message);
       else if (cached) {
         const payload = cached.dossier_payload as unknown as InstitutionalDossier;
-        return json(
-          {
-            ok: true,
-            cached: true,
-            slug,
-            dossier: { ...payload, id: cached.id as string },
-            sourceCount: payload.sources?.length ?? 0,
-            elapsedMs: Date.now() - started,
-          },
-          200,
-          cors,
-        );
+        // Legacy dossiers were shaped for the old coverage model. Treat them as a
+        // cache miss so the entity is re-synthesised against the current schema.
+        if (payload?.schemaVersion === DOSSIER_SCHEMA_VERSION) {
+          return json(
+            {
+              ok: true,
+              cached: true,
+              slug,
+              dossier: { ...payload, id: cached.id as string },
+              sourceCount: payload.sources?.length ?? 0,
+              elapsedMs: Date.now() - started,
+            },
+            200,
+            cors,
+          );
+        }
       }
     }
 

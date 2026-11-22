@@ -9,7 +9,7 @@ no Drizzle, no external AI gateway).
 | `functions/research-entity/`  | Tavily deep research + direct Gemini JSON synthesis, cached in `institutional_dossiers` |
 | `functions/voice-brief/`      | Deepgram Aura TTS only — returns raw `audio/mpeg`                                       |
 | `functions/dealdesk-qa/`      | Deepgram Nova STT + SerpAPI Google search — **no Gemini**                               |
-| `functions/pilot-simulation/` | ROI snapshots for the Wholesale ROI Simulator                                           |
+| `functions/pilot-simulation/` | Snapshots for the IS Audit Capacity & Risk-Mitigation Simulator                         |
 | `functions/_shared/`          | CORS, publishable-key gate, admin client, provider adapters, schema, ROI model          |
 
 ## 1. Secrets
@@ -38,12 +38,26 @@ name in the request path (`functions/_shared/gemini.ts`):
 | Standard synthesis (`deep: false`) | `gemini-3.5-flash-lite` | cached when possible                   |
 | Deep synthesis (`deep: true`)      | `gemini-3.5-flash-lite` | forces a refresh, larger prompt budget |
 
-There is **no** fallback model and no Pro tier: `gemini-3.8-flash` is paused to
+There is **no** fallback model and no Pro tier: the Pro tier is paused to
 protect the token quota and `gemini-2.5-flash` is retired. Failures are retried
 twice on `429`/`5xx` (a rejected call costs no tokens), then return
 `502 synthesis_unavailable`.
 
 `research-entity` returns `synthesisModel` so the model that answered is explicit.
+Cached rows are only reused when `dossier_payload.schemaVersion === 2`; anything
+older is treated as a cache miss and re-synthesised against the current audit
+schema.
+
+`pilot_simulations` keeps its original column names so no migration is needed.
+The IS audit inputs are mapped onto them in `functions/pilot-simulation/index.ts`:
+
+| Column                          | Now stores                                  |
+| ------------------------------- | ------------------------------------------- |
+| `rm_count`                      | active IS auditors                          |
+| `weekly_hours_saved`            | manual scoping hours saved / auditor / week |
+| `avg_mandate_fee_aed`           | average ICT loss prevented per audit (ETB)  |
+| `win_rate_lift_pct`             | control-gap detection lift (%)              |
+| `projected_incremental_fee_aed` | projected loss prevented (ETB)              |
 
 Never put any of these keys in Vercel or in the repo. The browser only ever holds
 the publishable key.
@@ -89,22 +103,22 @@ KEY=$SUPABASE_PUBLISHABLE_KEY
 # Research Agent — Tavily + Gemini (slow, ~10-25s)
 curl -s -X POST "$BASE/research-entity" -H "apikey: $KEY" \
   -H "content-type: application/json" \
-  -d '{"query":"Emirates NBD","forceRefresh":false}'
+  -d '{"query":"Ethio Telecom","forceRefresh":false}'
 
 # Same call again must return {"ok":true,"cached":true,...}
 curl -s -X POST "$BASE/research-entity" -H "apikey: $KEY" \
-  -H "content-type: application/json" -d '{"query":"Emirates NBD"}'
+  -H "content-type: application/json" -d '{"query":"Ethio Telecom"}'
 
 # Voice Agent — Deepgram Aura, expect audio/mpeg bytes
 curl -s -o brief.mp3 -w '%{http_code} %{content_type} %{size_download}\n' \
   -X POST "$BASE/voice-brief" -H "apikey: $KEY" \
   -H "content-type: application/json" \
-  -d '{"script":"Good morning. Three capital triggers stand out."}'
+  -d '{"script":"Good morning. Three control priorities stand out."}'
 
 # Search Agent — SerpAPI only, no LLM
 curl -s -X POST "$BASE/dealdesk-qa" -H "apikey: $KEY" \
   -H "content-type: application/json" \
-  -d '{"questionText":"latest credit rating","entityName":"Emirates NBD"}'
+  -d '{"questionText":"latest INSA cyber directive","entityName":"Ethio Telecom"}'
 ```
 
 A missing or wrong `apikey` must return `401 {"ok":false,"error":"Unauthorized"}`.

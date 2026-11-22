@@ -34,7 +34,9 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
     synth.cancel();
     const u = new SpeechSynthesisUtterance(script);
     u.rate = 1.02;
-    const voice = synth.getVoices().find((v) => /en-(GB|US)/.test(v.lang) && /male|daniel|george|alex/i.test(v.name));
+    const voice = synth
+      .getVoices()
+      .find((v) => /en-(GB|US)/.test(v.lang) && /male|daniel|george|alex/i.test(v.name));
     if (voice) u.voice = voice;
     u.onboundary = (e) => setProgress(Math.min(1, e.charIndex / script.length));
     u.onend = () => {
@@ -91,7 +93,9 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
       <div className="flex items-center gap-3 p-3">
         <button
           onClick={start}
-          aria-label={state === "playing" ? "Pause audio brief" : "Play 60-second RM audio brief"}
+          aria-label={
+            state === "playing" ? "Pause audio brief" : "Play 60-second Lead Auditor brief"
+          }
           className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gold-gradient text-gold-foreground shadow-gold transition hover:brightness-110"
         >
           {state === "loading" ? (
@@ -103,9 +107,9 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
           )}
         </button>
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-medium">Play 60s RM Audio Brief</div>
+          <div className="text-sm font-medium">Play 60s Lead Auditor Brief</div>
           <div className="eyebrow !text-[10px] mt-0.5">
-            {engine === "browser" ? "Browser voice fallback" : "Voice Agent · executive voice"}
+            {engine === "browser" ? "Browser voice fallback" : "Voice Agent · lead auditor voice"}
           </div>
         </div>
         <div className="flex h-8 items-center gap-[3px]" aria-hidden="true">
@@ -119,12 +123,24 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
         </div>
       </div>
       <div className="h-px bg-border">
-        <div className="h-px bg-gold transition-[width] duration-200" style={{ width: `${progress * 100}%` }} />
+        <div
+          className="h-px bg-gold transition-[width] duration-200"
+          style={{ width: `${progress * 100}%` }}
+        />
       </div>
       {showTranscript && (
         <p className="max-h-36 overflow-y-auto p-3 text-[13px] leading-relaxed text-muted-foreground">
           {words.map((w, i) => (
-            <span key={i} className={i === activeWord && state === "playing" ? "rounded bg-gold/20 text-foreground" : i < activeWord ? "text-foreground/90" : ""}>
+            <span
+              key={i}
+              className={
+                i === activeWord && state === "playing"
+                  ? "rounded bg-gold/20 text-foreground"
+                  : i < activeWord
+                    ? "text-foreground/90"
+                    : ""
+              }
+            >
               {w}{" "}
             </span>
           ))}

@@ -8,7 +8,8 @@ import { useTerminal } from "./terminal-context";
 
 type Phase = "idle" | "recording" | "transcribing" | "thinking" | "speaking";
 
-const SUGGESTED = "What are the top two refinancing or FX risks for this client, and which division should lead?";
+const SUGGESTED =
+  "What are the top two control gaps and fraud risks for this system, and which EISAA pillar should lead?";
 
 function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -27,7 +28,11 @@ export function DealDeskDock() {
 
   const [phase, setPhase] = useState<Phase>("idle");
   const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState<{ answer: string; leadDivision: string; sourceRefs: number[] } | null>(null);
+  const [answer, setAnswer] = useState<{
+    answer: string;
+    leadPillar: string;
+    sourceRefs: number[];
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const recorder = useRef<MediaRecorder | null>(null);
   const chunks = useRef<Blob[]>([]);
@@ -64,12 +69,14 @@ export function DealDeskDock() {
       setError(null);
       setAnswer(null);
       setPhase("thinking");
-      const res = await ask({ data: { question: q, dossierJson: JSON.stringify(activeDossier) } }).catch(() => null);
+      const res = await ask({
+        data: { question: q, dossierJson: JSON.stringify(activeDossier) },
+      }).catch(() => null);
       if (!res?.ok) {
-        setError(res && !res.ok ? res.error : "The Deal Desk couldn't answer right now.");
+        setError(res && !res.ok ? res.error : "The AuditDesk couldn't answer right now.");
         return setPhase("idle");
       }
-      setAnswer({ answer: res.answer, leadDivision: res.leadDivision, sourceRefs: res.sourceRefs });
+      setAnswer({ answer: res.answer, leadPillar: res.leadPillar, sourceRefs: res.sourceRefs });
       void speak(res.spoken);
     },
     [activeDossier, ask, speak],
@@ -96,7 +103,9 @@ export function DealDeskDock() {
         }
         setPhase("transcribing");
         const b64 = await blobToBase64(blob);
-        const res = await transcribe({ data: { audioBase64: b64, mime: blob.type } }).catch(() => null);
+        const res = await transcribe({ data: { audioBase64: b64, mime: blob.type } }).catch(
+          () => null,
+        );
         if (!res?.ok || !res.transcript) {
           setPhase("idle");
           return setError("Couldn't hear that clearly — try again or type your question.");
@@ -122,12 +131,20 @@ export function DealDeskDock() {
     if (recorder.current?.state === "recording") recorder.current.stop();
   }, []);
 
-  // Hold Space to talk — only while the Deal Desk is open, so Space still scrolls the page.
+  // Hold Space to talk — only while the AuditDesk is open, so Space still scrolls the page.
   useEffect(() => {
     const isTyping = (t: EventTarget | null) =>
-      t instanceof HTMLElement && (t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName));
+      t instanceof HTMLElement &&
+      (t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName));
     const down = (e: KeyboardEvent) => {
-      if (!deskOpen || e.code !== "Space" || e.repeat || isTyping(e.target) || document.querySelector("[role=dialog]")) return;
+      if (
+        !deskOpen ||
+        e.code !== "Space" ||
+        e.repeat ||
+        isTyping(e.target) ||
+        document.querySelector("[role=dialog]")
+      )
+        return;
       e.preventDefault();
       void startRecording();
     };
@@ -158,16 +175,28 @@ export function DealDeskDock() {
           >
             <div className="flex items-center justify-between border-b border-border px-4 py-3">
               <div>
-                <div className="text-sm font-semibold">Ask the Deal Desk</div>
-                <div className="eyebrow !text-[10px] mt-0.5 truncate">Context · {activeDossier.entityName}</div>
+                <div className="text-sm font-semibold">Ask the AuditDesk</div>
+                <div className="eyebrow !text-[10px] mt-0.5 truncate">
+                  Context · {activeDossier.entityName}
+                </div>
               </div>
-              <button onClick={() => setDeskOpen(false)} aria-label="Close Deal Desk" className="text-muted-foreground hover:text-foreground">
+              <button
+                onClick={() => setDeskOpen(false)}
+                aria-label="Close AuditDesk"
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="size-4" />
               </button>
             </div>
             <div className="max-h-[50vh] space-y-3 overflow-y-auto p-4">
               {!answer && !busy && !question && (
-                <button onClick={() => { setQuestion(SUGGESTED); void submit(SUGGESTED); }} className="w-full rounded-md border border-dashed border-hairline-strong p-3 text-left text-[13px] text-muted-foreground hover:border-gold/50 hover:text-foreground">
+                <button
+                  onClick={() => {
+                    setQuestion(SUGGESTED);
+                    void submit(SUGGESTED);
+                  }}
+                  className="w-full rounded-md border border-dashed border-hairline-strong p-3 text-left text-[13px] text-muted-foreground hover:border-gold/50 hover:text-foreground"
+                >
                   “{SUGGESTED}”
                 </button>
               )}
@@ -180,23 +209,39 @@ export function DealDeskDock() {
               {busy && (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Loader2 className="size-3.5 animate-spin text-gold" />
-                  <span className="num">{phase === "transcribing" ? "Transcribing · Voice Agent" : "Reasoning over dossier · Research Agent"}</span>
+                  <span className="num">
+                    {phase === "transcribing"
+                      ? "Transcribing · Voice Agent"
+                      : "Reasoning over dossier · Research Agent"}
+                  </span>
                 </div>
               )}
               {answer && (
-                <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="rounded-md border border-gold/30 bg-gold/5 p-3">
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="rounded-md border border-gold/30 bg-gold/5 p-3"
+                >
                   <div className="mb-1.5 flex items-center justify-between">
-                    <span className="eyebrow !text-[9.5px] text-gold">Lead: {answer.leadDivision}</span>
+                    <span className="eyebrow !text-[9.5px] text-gold">
+                      Lead: {answer.leadPillar}
+                    </span>
                     {phase === "speaking" && (
                       <span className="flex h-3 items-center gap-[2px]">
                         {[0, 1, 2, 3].map((i) => (
-                          <span key={i} className="h-full w-[2px] rounded-full bg-gold animate-wave" style={{ animationDelay: `${i * 0.12}s` }} />
+                          <span
+                            key={i}
+                            className="h-full w-[2px] rounded-full bg-gold animate-wave"
+                            style={{ animationDelay: `${i * 0.12}s` }}
+                          />
                         ))}
                       </span>
                     )}
                   </div>
                   <p className="text-[13px] leading-relaxed">{answer.answer}</p>
-                  <div className="mt-2"><SourceBadges refs={answer.sourceRefs} sources={activeDossier.sources} /></div>
+                  <div className="mt-2">
+                    <SourceBadges refs={answer.sourceRefs} sources={activeDossier.sources} />
+                  </div>
                 </motion.div>
               )}
               {error && <p className="text-xs text-crimson">{error}</p>}
@@ -214,7 +259,12 @@ export function DealDeskDock() {
                 placeholder="Type a question, or hold Space to talk"
                 className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm outline-none placeholder:text-muted-foreground focus:border-gold/50"
               />
-              <button type="submit" disabled={busy} aria-label="Send question" className="flex size-9 items-center justify-center rounded-md border border-border text-muted-foreground hover:text-gold disabled:opacity-40">
+              <button
+                type="submit"
+                disabled={busy}
+                aria-label="Send question"
+                className="flex size-9 items-center justify-center rounded-md border border-border text-muted-foreground hover:text-gold disabled:opacity-40"
+              >
                 <Send className="size-4" />
               </button>
             </form>
@@ -230,17 +280,31 @@ export function DealDeskDock() {
         }}
         onPointerUp={stopRecording}
         onPointerLeave={stopRecording}
-        aria-label="Hold to ask the Deal Desk"
+        aria-label="Hold to ask the AuditDesk"
         className={`group flex items-center gap-2.5 rounded-full border py-2 pl-2 pr-4 shadow-2xl backdrop-blur transition ${
-          phase === "recording" ? "border-crimson/60 bg-crimson/15" : "border-hairline-strong bg-popover/90 hover:border-azure/60"
+          phase === "recording"
+            ? "border-crimson/60 bg-crimson/15"
+            : "border-hairline-strong bg-popover/90 hover:border-azure/60"
         }`}
       >
-        <span className={`flex size-9 items-center justify-center rounded-full ${phase === "recording" ? "bg-crimson text-destructive-foreground" : "bg-azure/15 text-azure"}`}>
-          {phase === "recording" ? <Square className="size-3.5" /> : busy ? <Loader2 className="size-4 animate-spin" /> : <Mic className="size-4" />}
+        <span
+          className={`flex size-9 items-center justify-center rounded-full ${phase === "recording" ? "bg-crimson text-destructive-foreground" : "bg-azure/15 text-azure"}`}
+        >
+          {phase === "recording" ? (
+            <Square className="size-3.5" />
+          ) : busy ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Mic className="size-4" />
+          )}
         </span>
         <span className="text-left leading-tight">
-          <span className="block text-[13px] font-medium">{phase === "recording" ? "Listening… release to send" : "Ask the Deal Desk"}</span>
-          <span className="num block text-[10px] text-muted-foreground">{deskOpen ? "Hold to talk · or hold Space" : "Voice copilot"}</span>
+          <span className="block text-[13px] font-medium">
+            {phase === "recording" ? "Listening… release to send" : "Ask the AuditDesk"}
+          </span>
+          <span className="num block text-[10px] text-muted-foreground">
+            {deskOpen ? "Hold to talk · or hold Space" : "Voice copilot"}
+          </span>
         </span>
       </button>
     </div>

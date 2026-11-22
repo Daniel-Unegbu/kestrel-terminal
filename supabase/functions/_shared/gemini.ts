@@ -6,6 +6,9 @@ const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models
  * One GEMINI_API_KEY covers every model; the tier only changes the model name.
  * There is exactly one model configured: the Pro tier is paused to protect the
  * project's token quota, and gemini-2.5-flash is no longer used at all.
+ *
+ * The same call powers IS audit synthesis and the Lead Auditor brief; this
+ * module only knows about JSON generation, never about audit domain rules.
  */
 const MODEL = "gemini-3.5-flash-lite";
 

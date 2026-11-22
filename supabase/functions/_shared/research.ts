@@ -7,10 +7,10 @@ export interface RetrievedDoc extends DossierSource {
   snippet: string;
 }
 
-/** Deep financial research for one entity, Tavily only. */
+/** Deep IS audit research for one system, Tavily only. */
 export async function retrieve(query: string): Promise<RetrievedDoc[]> {
   const docs = await tavilySearch(
-    `${query} financial performance revenue EBITDA debt sukuk expansion UAE MENA`,
+    `${query} Ethiopia ICT infrastructure cybersecurity IS audit governance INSA ISO 20000 digital transformation`,
     8,
   );
 
@@ -26,24 +26,24 @@ export async function retrieve(query: string): Promise<RetrievedDoc[]> {
     }));
 }
 
-const SYSTEM = `You are a senior credit analyst in First Abu Dhabi Bank's Wholesale Banking and IB&M coverage team.
-You turn retrieved web sources into a strict JSON institutional dossier. Rules:
-- Ground every figure in the numbered SOURCES. If a figure is not disclosed, give a conservative analyst estimate and keep it plausible; never invent sources.
+const SYSTEM = `You are a Lead Information Systems (IS) Auditor and IT Governance Specialist supporting the Ethiopian Information System Audit Association (EISAA).
+You turn retrieved web sources into a strict JSON IS audit dossier. Rules:
+- Ground every figure and finding in the numbered SOURCES. If a figure is not disclosed, give a conservative auditor estimate and keep it plausible; never invent sources.
 - sourceRefs / sourceIndex are 0-based indexes into SOURCES.
-- Amounts in AED (convert USD at 3.6725).
-- executiveBriefAudioScript: a crisp ~140 word (60 second) spoken morning-call brief for a Relationship Manager. Start with "Good morning. Ahead of your coverage meeting with <entity>, three capital triggers stand out." Name the FAB division that should lead. No markdown, no bullets, no citations read aloud.
-- debtMaturityProfile: exactly the years 2026, 2027, 2028, 2029.
-- fabDivisionRouting: 3-4 items, divisions only from: Global Corporate Finance, Global Transaction Banking, Global Markets, FAB Siraj Islamic Banking.
-- complianceAndRiskRadar: 2-4 items, categories only from: "CBUAE / Regulatory", "Sanctions & Adverse Media", "FX & Corridor Risk", "ESG / Transition Finance".
+- Amounts in Ethiopian birr (ETB). Convert USD at a reasonable reference rate and present uncertain figures as estimates.
+- executiveBriefAudioScript: a crisp ~140 word (60 second) spoken morning-call brief for the Lead IS Auditor. Start with "Good morning. Ahead of your audit scoping for <entity>, three control priorities stand out." Name the EISAA pillar that should lead. No markdown, no bullets, no citations read aloud.
+- remediationRoadmap: exactly the periods 2026, 2027, 2028, 2029.
+- eisaaPillarRouting: 3-4 items, pillars only from: Pre-Development System Audit, Post-Development & Fraud Audit, ISO 20000 & ITSM Governance, IS Auditor Capacity & Training.
+- governanceRiskRadar: 2-4 items, categories only from: "INSA / National Cyber Policy", "Proclamation 1113/2019 & Governance", "Fraud & Internal Control Risk", "ISO 20000 / Service Continuity".
 Return JSON only with this shape:
-{"entityName":string,"tickerOrRegistry":string,"sector":string,"jurisdiction":string,"segment":"GRE_SOVEREIGN"|"IBM_CORPORATE"|"FINANCIAL_INSTITUTION"|"COMMERCIAL_SME","executiveSummary":string,"executiveBriefAudioScript":string,
-"financialMetrics":{"estimatedRevenueAED":string,"ebitdaMarginPct":number,"netDebtToEbitda":number,"interestCoverageRatio":number,"cashConversionCycleDays":number,"creditRiskRating":"LOW_RISK"|"MODERATE_WATCH"|"ELEVATED_REVIEW","sourceRefs":number[]},
-"workingCapital":{"dsoDays":number,"dioDays":number,"dpoDays":number,"trappedLiquidityAEDMillions":number,"tradeFinanceVelocity":string,"sourceRefs":number[]},
-"debtMaturityProfile":[{"year":string,"maturingDebtAEDMillions":number,"instrumentType":"Syndicated Loan"|"Sukuk / Bond"|"Trade Facility"}],
-"bondIssuanceProbabilityPct":number,
-"corridors":[{"corridor":string,"flowSharePct":number,"fxPair":string,"fabHub":string}],
-"fabDivisionRouting":[{"division":string,"recommendedProduct":string,"triggerSignal":string,"estimatedFeePoolAED":string,"confidenceScore":number,"sourceRefs":number[]}],
-"complianceAndRiskRadar":[{"category":string,"severity":"INFO"|"WATCH"|"CRITICAL","finding":string,"sourceIndex":number}]}`;
+{"entityName":string,"tickerOrRegistry":string,"sector":string,"jurisdiction":string,"segment":"PUBLIC_SECTOR_INFRA"|"FINANCIAL_CORE_SYSTEMS"|"TELECOM_CLOUD_ITSM"|"ENTERPRISE_ERP_GOV","executiveSummary":string,"executiveBriefAudioScript":string,
+"auditPosture":{"systemCriticalityTier":string,"controlMaturityPct":number,"openAuditFindingsRatio":number,"iso20000ComplianceScore":number,"meanTimeToRemediateDays":number,"auditRiskPosture":"LOW_RISK"|"MODERATE_WATCH"|"ELEVATED_REVIEW","sourceRefs":number[]},
+"evidenceFlow":{"evidenceCollectionDays":number,"logRetentionDays":number,"findingClosureDays":number,"openRiskExposureETBMillions":number,"auditToolingMaturity":string,"sourceRefs":number[]},
+"remediationRoadmap":[{"period":string,"findingsToRemediate":number,"workstream":"Pre-Development Control"|"Post-Development Audit"|"Fraud & Access Hardening"}],
+"preDeploymentCoveragePct":number,
+"regulatoryCoverage":[{"framework":string,"coveragePct":number,"regulator":string,"ecosystemPartner":string}],
+"eisaaPillarRouting":[{"pillar":string,"recommendedService":string,"triggerSignal":string,"estimatedRiskExposureETB":string,"confidenceScore":number,"sourceRefs":number[]}],
+"governanceRiskRadar":[{"category":string,"severity":"INFO"|"WATCH"|"CRITICAL","finding":string,"sourceIndex":number}]}`;
 
 export interface SynthesisResult {
   dossier: InstitutionalDossier;
@@ -74,22 +74,23 @@ export async function synthesize(
 
   const dossier: InstitutionalDossier = {
     ...parsed,
+    schemaVersion: 2,
     entityName: parsed.entityName || entity,
     lastUpdatedIso: new Date().toISOString(),
-    financialMetrics: {
-      ...parsed.financialMetrics,
-      sourceRefs: cleanRefs(parsed.financialMetrics.sourceRefs),
+    auditPosture: {
+      ...parsed.auditPosture,
+      sourceRefs: cleanRefs(parsed.auditPosture.sourceRefs),
     },
-    workingCapital: {
-      ...parsed.workingCapital,
-      sourceRefs: cleanRefs(parsed.workingCapital.sourceRefs),
+    evidenceFlow: {
+      ...parsed.evidenceFlow,
+      sourceRefs: cleanRefs(parsed.evidenceFlow.sourceRefs),
     },
-    fabDivisionRouting: parsed.fabDivisionRouting.map((route) => ({
+    eisaaPillarRouting: parsed.eisaaPillarRouting.map((route) => ({
       ...route,
       confidenceScore: Math.max(0, Math.min(100, Math.round(route.confidenceScore))),
       sourceRefs: cleanRefs(route.sourceRefs),
     })),
-    complianceAndRiskRadar: parsed.complianceAndRiskRadar.map((item) => {
+    governanceRiskRadar: parsed.governanceRiskRadar.map((item) => {
       const source = item.sourceIndex != null ? docs[item.sourceIndex] : undefined;
       return {
         category: item.category,

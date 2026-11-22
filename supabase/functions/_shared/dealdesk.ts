@@ -1,12 +1,12 @@
 /**
- * Deterministic Deal Desk answers.
+ * Deterministic AuditDesk answers.
  *
- * The Deal Desk path is SerpAPI-only, so a web snippet is the only thing it can
- * quote. That cannot answer questions about *this* client's file ("which FAB
- * division should lead?") and Google has no answer box for them either. When a
- * question asks for analysis the dossier already holds, the answer is assembled
- * from those researched facts verbatim; SerpAPI is not called at all, and the
- * citations come from the dossier.
+ * The AuditDesk path is SerpAPI-only, so a web snippet is the only thing it can
+ * quote. That cannot answer questions about *this* system's audit file ("which
+ * EISAA pillar should lead?") and Google has no answer box for them either. When
+ * a question asks for analysis the dossier already holds, the answer is
+ * assembled from those researched facts verbatim; SerpAPI is not called at all,
+ * and the citations come from the dossier.
  */
 
 export interface DossierRisk {
@@ -16,41 +16,42 @@ export interface DossierRisk {
   sourceUrl?: string;
 }
 
-export interface DossierDebt {
-  year?: string;
-  maturingDebtAEDMillions?: number;
-  instrumentType?: string;
+export interface DossierRemediation {
+  period?: string;
+  findingsToRemediate?: number;
+  workstream?: string;
 }
 
-export interface DossierDivision {
-  division?: string;
-  recommendedProduct?: string;
+export interface DossierPillarRoute {
+  pillar?: string;
+  recommendedService?: string;
   triggerSignal?: string;
-  estimatedFeePoolAED?: string;
+  estimatedRiskExposureETB?: string;
   confidenceScore?: number;
 }
 
 export interface DealDeskDossier {
   entityName?: string;
-  complianceAndRiskRadar?: DossierRisk[];
-  debtMaturityProfile?: DossierDebt[];
-  fabDivisionRouting?: DossierDivision[];
+  governanceRiskRadar?: DossierRisk[];
+  remediationRoadmap?: DossierRemediation[];
+  eisaaPillarRouting?: DossierPillarRoute[];
 }
 
 export interface DealDeskComposition {
   answerText: string;
-  /** Shorter narrative for the voice relay, so the lead division is never cut. */
+  /** Shorter narrative for the voice relay, so the lead pillar is never cut. */
   spokenText: string;
   /** Dossier sources backing this answer; the client maps them to source refs. */
   sourceUrls: string[];
 }
 
 const INTENT = {
-  risk: /\b(risk|risks|risky|exposure|exposures|compliance|regulatory|covenants?|downgrades?|headwinds?)\b/i,
-  fx: /\b(fx|forex|currenc(?:y|ies)|corridors?|hedg\w*|convertibility|devaluation)\b/i,
-  refinancing: /\b(refinanc\w*|maturit(?:y|ies)|repayment|roll[- ]?over|debt wall)\b/i,
-  debt: /\b(debt|sukuk|bonds?|issuance|facilit(?:y|ies)|repay\w*|leverage|capital)\b/i,
-  division: /\b(divisions?|team|coverage|route|routing|lead|owner|pitch|product)\b/i,
+  risk: /\b(risk|risks|risky|exposure|exposures|compliance|regulatory|control|controls|findings?|gaps?|weakness\w*)\b/i,
+  cyber: /\b(insa|ecysa|cyber|security|breach|incident|vulnerab\w*|threat\w*)\b/i,
+  fraud: /\b(fraud|segregation|maker[- ]checker|access|privileg\w*|misappropriat\w*)\b/i,
+  remediation: /\b(remediat\w*|closure|close|roadmap|fix|fixes|timeline|backlog)\b/i,
+  itsm: /\b(iso ?20000|itsm|service management|incident|change|continuity|sla)\b/i,
+  pillar: /\b(pillars?|divisions?|team|coverage|route|routing|lead|owner|audit type|service)\b/i,
   profile: /\b(who|what|describe|background|overview|profile|about)\b/i,
 };
 
@@ -79,15 +80,9 @@ function clamp(value: string, limit: number): string {
   return `${(cut > limit * 0.5 ? slice.slice(0, cut) : slice).trimEnd()}…`;
 }
 
-function formatAed(millions: number | undefined): string | null {
-  if (typeof millions !== "number" || !Number.isFinite(millions) || millions <= 0) return null;
-  if (millions >= 1000) return `AED ${(millions / 1000).toFixed(2).replace(/\.?0+$/, "")}B`;
-  return `AED ${Math.round(millions)}M`;
-}
-
 function riskParagraph(dossier: DealDeskDossier, tokens: string[]): string | null {
-  const entity = dossier.entityName?.trim() || "this client";
-  const risks = (dossier.complianceAndRiskRadar ?? [])
+  const entity = dossier.entityName?.trim() || "this system";
+  const risks = (dossier.governanceRiskRadar ?? [])
     .filter((risk) => !!risk.finding)
     .sort((a, b) => {
       const severity =
@@ -100,73 +95,79 @@ function riskParagraph(dossier: DealDeskDossier, tokens: string[]): string | nul
 
   if (risks.length === 0) return null;
 
-  const lead = risks.length === 1 ? "The main risk" : "Two risks";
+  const lead = risks.length === 1 ? "The main control gap" : "Two control gaps";
   const [first, second] = risks;
 
   const firstLine = `${lead} stand out for ${entity}${
     risks.length === 1 ? "s" : ""
-  } — ${first.category ?? "Risk"}, ${first.severity ?? "WATCH"}: ${clamp(
+  } — ${first.category ?? "Control risk"}, ${first.severity ?? "WATCH"}: ${clamp(
     sentence(first.finding ?? ""),
     220,
   )}`;
 
   if (!second) return firstLine;
 
-  return `${firstLine} Second, ${second.category ?? "Risk"}, ${
+  return `${firstLine} Second, ${second.category ?? "Control risk"}, ${
     second.severity ?? "WATCH"
   }: ${clamp(sentence(second.finding ?? ""), 220)}`;
 }
 
-function debtParagraph(dossier: DealDeskDossier): string | null {
-  const entity = dossier.entityName?.trim() || "this client";
-  const maturities = [...(dossier.debtMaturityProfile ?? [])]
-    .filter((item) => typeof item.maturingDebtAEDMillions === "number")
-    .sort((a, b) => (b.maturingDebtAEDMillions ?? 0) - (a.maturingDebtAEDMillions ?? 0))
-    .slice(0, 2);
+function remediationParagraph(dossier: DealDeskDossier): string | null {
+  const entity = dossier.entityName?.trim() || "this system";
+  const years = [...(dossier.remediationRoadmap ?? [])]
+    .filter((item) => typeof item.findingsToRemediate === "number")
+    .sort((a, b) => (a.period ?? "").localeCompare(b.period ?? ""))
+    .slice(0, 3);
 
-  if (maturities.length === 0) return null;
+  if (years.length === 0) return null;
 
-  const stack = maturities
+  const stack = years
     .map((item) => {
-      const amount = formatAed(item.maturingDebtAEDMillions);
-      if (!amount) return null;
-      return `${amount} of ${(item.instrumentType ?? "debt").toLowerCase()} in ${item.year ?? "the coming year"}`;
+      const count = Math.round(item.findingsToRemediate ?? 0);
+      if (!Number.isFinite(count) || count <= 0) return null;
+      const workstream = (item.workstream ?? "control hardening").toLowerCase();
+      return `${count} findings in ${item.period ?? "the coming cycle"} under ${workstream}`;
     })
-    .filter(Boolean);
+    .filter((value): value is string => !!value);
 
   if (stack.length === 0) return null;
 
-  return `On refinancing, ${entity} faces ${stack.join(", and the next largest is ")}.`;
+  return `On remediation, ${entity} is tracking ${stack.join("; ")}.`;
 }
 
-function divisionParagraph(dossier: DealDeskDossier): string | null {
-  const divisions = (dossier.fabDivisionRouting ?? []).filter((item) => !!item.division);
-  if (divisions.length === 0) return null;
+function pillarParagraph(dossier: DealDeskDossier): string | null {
+  const routes = (dossier.eisaaPillarRouting ?? []).filter((item) => !!item.pillar);
+  if (routes.length === 0) return null;
 
-  const lead = [...divisions].sort(
-    (a, b) => (b.confidenceScore ?? 0) - (a.confidenceScore ?? 0),
-  )[0];
-  if (!lead?.division) return null;
+  const lead = [...routes].sort((a, b) => (b.confidenceScore ?? 0) - (a.confidenceScore ?? 0))[0];
+  if (!lead?.pillar) return null;
 
   const details: string[] = [];
-  if (lead.recommendedProduct) details.push(lead.recommendedProduct.toLowerCase());
+  if (lead.recommendedService) details.push(lead.recommendedService.toLowerCase());
   if (lead.triggerSignal) details.push(`triggered by ${lead.triggerSignal}`);
-  if (lead.estimatedFeePoolAED) details.push(`a fee pool of about ${lead.estimatedFeePoolAED}`);
+  if (lead.estimatedRiskExposureETB) {
+    details.push(`risk exposure of about ${lead.estimatedRiskExposureETB}`);
+  }
   if (typeof lead.confidenceScore === "number") {
     details.push(`${lead.confidenceScore}% confidence`);
   }
 
   const tail = details.length ? ` — ${details.join(", ")}` : "";
 
-  return `${lead.division} should lead this client${tail}.`;
+  return `${lead.pillar} should lead this audit${tail}.`;
 }
 
-function wantsDivision(question: string): boolean {
-  return INTENT.division.test(question);
+function wantsPillar(question: string): boolean {
+  return INTENT.pillar.test(question);
 }
 
 function wantsRisk(question: string): boolean {
-  return INTENT.risk.test(question) || INTENT.fx.test(question) || INTENT.refinancing.test(question);
+  return (
+    INTENT.risk.test(question) ||
+    INTENT.cyber.test(question) ||
+    INTENT.fraud.test(question) ||
+    INTENT.itsm.test(question)
+  );
 }
 
 /**
@@ -186,22 +187,22 @@ export function composeDealDeskAnswer(
   if (wantsRisk(question)) {
     const risk = riskParagraph(dossier, tokens);
     if (risk) parts.push(risk);
-    // Only add the maturity wall when the risk radar did not already cover it.
-    if (INTENT.refinancing.test(question) || INTENT.debt.test(question)) {
-      const covered = parts.some((part) => /matur|refinanc|sukuk|bond/i.test(part));
+    // Only add the remediation roadmap when the radar did not already cover it.
+    if (INTENT.remediation.test(question)) {
+      const covered = parts.some((part) => /remediat|roadmap|closure/i.test(part));
       if (!covered) {
-        const debt = debtParagraph(dossier);
-        if (debt) parts.push(debt);
+        const roadmap = remediationParagraph(dossier);
+        if (roadmap) parts.push(roadmap);
       }
     }
-  } else if (INTENT.debt.test(question) || INTENT.refinancing.test(question)) {
-    const debt = debtParagraph(dossier);
-    if (debt) parts.push(debt);
+  } else if (INTENT.remediation.test(question)) {
+    const roadmap = remediationParagraph(dossier);
+    if (roadmap) parts.push(roadmap);
   }
 
-  if (wantsDivision(question)) {
-    const division = divisionParagraph(dossier);
-    if (division) parts.push(division);
+  if (wantsPillar(question)) {
+    const pillar = pillarParagraph(dossier);
+    if (pillar) parts.push(pillar);
   }
 
   if (parts.length === 0) return null;
@@ -209,7 +210,7 @@ export function composeDealDeskAnswer(
   const answerText = parts.join(" ");
   const spokenText = clamp(answerText, 300);
 
-  const sourceUrls = (dossier.complianceAndRiskRadar ?? [])
+  const sourceUrls = (dossier.governanceRiskRadar ?? [])
     .map((risk) => risk.sourceUrl)
     .filter((url): url is string => !!url);
 

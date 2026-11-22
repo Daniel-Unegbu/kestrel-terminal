@@ -11,7 +11,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { UAE_MARKET_COPY } from "../lib/fab-references";
+import { EISAA_COPY } from "../lib/eisaa-references";
 import { Toaster } from "@/components/ui/sonner";
 import { AppHeader } from "@/components/terminal/app-header";
 import { CommandPalette } from "@/components/terminal/command-palette";
@@ -85,16 +85,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Kestrel Terminal — Institutional Coverage & Deal Intelligence" },
+      { title: "Kestrel Terminal — IS Audit, IT Governance & Cyber Risk Intelligence" },
       {
         name: "description",
-        content: "Institutional capital markets terminal for relationship managers: cited client dossiers, voice briefs and fee-income modelling.",
+        content:
+          "IS audit, IT governance and cyber risk intelligence terminal for EISAA members: cited system dossiers, Lead Auditor briefs and control-gap modelling.",
       },
       { name: "author", content: "Kestrel Terminal" },
-      { property: "og:title", content: "Kestrel Terminal — Institutional Coverage & Deal Intelligence" },
+      {
+        property: "og:title",
+        content: "Kestrel Terminal — IS Audit, IT Governance & Cyber Risk Intelligence",
+      },
       {
         property: "og:description",
-        content: "Cited client dossiers, voice briefs and fee-income modelling for wholesale bankers.",
+        content:
+          "Cited audit dossiers, Lead Auditor voice briefs and control-gap modelling for Ethiopian public and private sector IS audit teams.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -149,8 +154,10 @@ function RootComponent() {
           </main>
           <footer className="border-t border-border no-print">
             <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-2 px-4 py-4 text-[11px] text-muted-foreground lg:px-6">
-              <span>Kestrel Terminal · Institutional coverage & deal intelligence prototype</span>
-              <span className="num">{UAE_MARKET_COPY.footerFigures}</span>
+              <span>
+                Kestrel Terminal · IS Audit, IT Governance & Cyber Risk Intelligence prototype
+              </span>
+              <span className="num">{EISAA_COPY.footerFigures}</span>
             </div>
           </footer>
         </div>

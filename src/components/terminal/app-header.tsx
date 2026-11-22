@@ -1,15 +1,15 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Command, Mic } from "lucide-react";
-import { UAE_MARKET_COPY } from "@/lib/fab-references";
+import { EISAA_COPY } from "@/lib/eisaa-references";
 import { KestrelMark } from "./kestrel-mark";
 import { MacroTicker } from "./macro-ticker";
 import { useTerminal } from "./terminal-context";
 
 const NAV = [
   { to: "/", label: "Command Center", pillar: "P1" },
-  { to: "/sandbox", label: "Coverage Sandbox", pillar: "P2" },
-  { to: "/roi-model", label: "ROI Model", pillar: "P5" },
+  { to: "/sandbox", label: "Audit Sandbox", pillar: "P2" },
+  { to: "/roi-model", label: "Impact Model", pillar: "P5" },
   { to: "/architecture", label: "Architecture", pillar: "P3·4" },
 ] as const;
 
@@ -24,7 +24,7 @@ export function AppHeader() {
           <KestrelMark />
           <div className="leading-none">
             <div className="text-[15px] font-semibold tracking-tight">Kestrel Terminal</div>
-            <div className="eyebrow !text-[9px] mt-1">{UAE_MARKET_COPY.headerSubtitle}</div>
+            <div className="eyebrow !text-[9px] mt-1">{EISAA_COPY.headerSubtitle}</div>
           </div>
         </Link>
         <nav className="hidden flex-1 items-center gap-1 md:flex">
@@ -54,7 +54,7 @@ export function AppHeader() {
             onClick={() => setDeskOpen(true)}
             className="hidden items-center gap-2 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-azure/50 hover:text-azure sm:flex"
           >
-            <Mic className="size-3.5" /> Deal Desk
+            <Mic className="size-3.5" /> AuditDesk
           </button>
           <button
             onClick={() => setPaletteOpen(true)}

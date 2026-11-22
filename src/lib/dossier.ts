@@ -1,24 +1,23 @@
 // Canonical Kestrel dossier schema (client-safe; shared by UI, server functions and presets).
 
 export type InstitutionalSegment =
-  | "GRE_SOVEREIGN"
-  | "IBM_CORPORATE"
-  | "FINANCIAL_INSTITUTION"
-  | "COMMERCIAL_SME";
+  "PUBLIC_SECTOR_INFRA" | "FINANCIAL_CORE_SYSTEMS" | "TELECOM_CLOUD_ITSM" | "ENTERPRISE_ERP_GOV";
 
-export type CreditRiskRating = "LOW_RISK" | "MODERATE_WATCH" | "ELEVATED_REVIEW";
-export type FabDivision =
-  | "Global Corporate Finance"
-  | "Global Transaction Banking"
-  | "Global Markets"
-  | "Islamic Banking";
+export type AuditRiskPosture = "LOW_RISK" | "MODERATE_WATCH" | "ELEVATED_REVIEW";
+export type EisaaPillar =
+  | "Pre-Development System Audit"
+  | "Post-Development & Fraud Audit"
+  | "ISO 20000 & ITSM Governance"
+  | "IS Auditor Capacity & Training";
 export type RadarCategory =
-  | "CBUAE / Regulatory"
-  | "Sanctions & Adverse Media"
-  | "FX & Corridor Risk"
-  | "ESG / Transition Finance";
+  | "INSA / National Cyber Policy"
+  | "Proclamation 1113/2019 & Governance"
+  | "Fraud & Internal Control Risk"
+  | "ISO 20000 / Service Continuity";
 export type Severity = "INFO" | "WATCH" | "CRITICAL";
 export type SearchProvider = "RESEARCH" | "SEARCH" | "REFERENCE";
+export type RemediationWorkstream =
+  "Pre-Development Control" | "Post-Development Audit" | "Fraud & Access Hardening";
 
 /** User-facing provider labels — never expose upstream vendor names in the UI. */
 export const PROVIDER_LABEL: Record<SearchProvider, string> = {
@@ -35,6 +34,8 @@ export interface DossierSource {
 
 export interface InstitutionalDossier {
   id?: string | undefined;
+  /** Bumped whenever the payload shape changes; legacy cached rows are a cache miss. */
+  schemaVersion?: 2 | undefined;
   entityName: string;
   tickerOrRegistry?: string | undefined;
   sector: string;
@@ -44,44 +45,44 @@ export interface InstitutionalDossier {
   executiveSummary: string;
   executiveBriefAudioScript: string;
   isPreset?: boolean | undefined;
-  financialMetrics: {
-    estimatedRevenueAED: string;
-    ebitdaMarginPct: number;
-    netDebtToEbitda: number;
-    interestCoverageRatio: number;
-    cashConversionCycleDays: number;
-    creditRiskRating: CreditRiskRating;
+  auditPosture: {
+    systemCriticalityTier: string;
+    controlMaturityPct: number;
+    openAuditFindingsRatio: number;
+    iso20000ComplianceScore: number;
+    meanTimeToRemediateDays: number;
+    auditRiskPosture: AuditRiskPosture;
     sourceRefs?: number[] | undefined;
   };
-  workingCapital: {
-    dsoDays: number;
-    dioDays: number;
-    dpoDays: number;
-    trappedLiquidityAEDMillions: number;
-    tradeFinanceVelocity: string;
+  evidenceFlow: {
+    evidenceCollectionDays: number;
+    logRetentionDays: number;
+    findingClosureDays: number;
+    openRiskExposureETBMillions: number;
+    auditToolingMaturity: string;
     sourceRefs?: number[] | undefined;
   };
-  debtMaturityProfile: Array<{
-    year: string;
-    maturingDebtAEDMillions: number;
-    instrumentType: "Syndicated Loan" | "Sukuk / Bond" | "Trade Facility";
+  remediationRoadmap: Array<{
+    period: string;
+    findingsToRemediate: number;
+    workstream: RemediationWorkstream;
   }>;
-  bondIssuanceProbabilityPct: number;
-  corridors: Array<{
-    corridor: string;
-    flowSharePct: number;
-    fxPair: string;
-    fabHub: string;
+  preDeploymentCoveragePct: number;
+  regulatoryCoverage: Array<{
+    framework: string;
+    coveragePct: number;
+    regulator: string;
+    ecosystemPartner: string;
   }>;
-  fabDivisionRouting: Array<{
-    division: FabDivision;
-    recommendedProduct: string;
+  eisaaPillarRouting: Array<{
+    pillar: EisaaPillar;
+    recommendedService: string;
     triggerSignal: string;
-    estimatedFeePoolAED: string;
+    estimatedRiskExposureETB: string;
     confidenceScore: number;
     sourceRefs?: number[] | undefined;
   }>;
-  complianceAndRiskRadar: Array<{
+  governanceRiskRadar: Array<{
     category: RadarCategory;
     severity: Severity;
     finding: string;
@@ -93,10 +94,26 @@ export interface InstitutionalDossier {
 }
 
 export const SEGMENTS: Array<{ id: InstitutionalSegment; label: string; short: string }> = [
-  { id: "GRE_SOVEREIGN", label: "GREs & Sovereign", short: "GRE" },
-  { id: "IBM_CORPORATE", label: "IB&M Corporates", short: "IB&M" },
-  { id: "FINANCIAL_INSTITUTION", label: "Financial Institutions", short: "FI" },
-  { id: "COMMERCIAL_SME", label: "Commercial & SME", short: "SME" },
+  {
+    id: "PUBLIC_SECTOR_INFRA",
+    label: "Public Sector & National Digital Infrastructure",
+    short: "Public",
+  },
+  {
+    id: "FINANCIAL_CORE_SYSTEMS",
+    label: "Banking, Payments & FinTech Core Systems",
+    short: "FinTech",
+  },
+  {
+    id: "TELECOM_CLOUD_ITSM",
+    label: "Telecom, Cloud & IT Service Management",
+    short: "ITSM",
+  },
+  {
+    id: "ENTERPRISE_ERP_GOV",
+    label: "Enterprise ERP & Fraud Control",
+    short: "ERP",
+  },
 ];
 
 export function slugify(name: string): string {

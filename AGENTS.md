@@ -12,10 +12,10 @@ Backend: independent Supabase project (`jovejkbnutimnpjprsva`).
 
 | Function           | Providers                     | Notes                                                            |
 | ------------------ | ----------------------------- | ---------------------------------------------------------------- |
-| `research-entity`  | Tavily + Gemini               | Deep research, JSON dossier, 60s script, cached by `entity_slug` |
+| `research-entity`  | Tavily + Gemini               | Deep research, JSON audit dossier, 60s brief, cached by `entity_slug` |
 | `voice-brief`      | Deepgram Aura (TTS)           | Returns raw `audio/mpeg`                                         |
-| `dealdesk-qa`      | Deepgram Nova (STT) + SerpAPI | Text answer + citations; **no Gemini on this path**              |
-| `pilot-simulation` | none                          | ROI snapshot persistence                                         |
+| `dealdesk-qa`      | Deepgram Nova (STT) + SerpAPI | AuditDesk answer + citations; **no Gemini on this path**         |
+| `pilot-simulation` | none                          | IS audit capacity & risk snapshot persistence                    |
 
 - One `GEMINI_API_KEY` serves every model. Both synthesis modes use
   `gemini-3.5-flash-lite` — the Pro tier is paused to protect the token quota and
@@ -24,3 +24,9 @@ Backend: independent Supabase project (`jovejkbnutimnpjprsva`).
   publishable key.
 - Visible UI wording: Research Agent (Tavily), Search Agent (SerpAPI), Voice Agent
   (Deepgram), Internal Database (Supabase).
+- Dossier payloads carry `schemaVersion: 2`. `research-entity` and the client's
+  `getDossier` both treat anything older as a cache miss and re-synthesise, so the
+  audit shape can change without a data migration.
+- `pilot_simulations` keeps its legacy column names (`rm_count`,
+  `avg_mandate_fee_aed`, `win_rate_lift_pct`, `projected_incremental_fee_aed`) and
+  maps the IS audit inputs onto them in `functions/pilot-simulation/index.ts`.

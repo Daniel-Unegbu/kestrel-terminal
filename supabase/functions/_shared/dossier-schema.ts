@@ -4,95 +4,113 @@ import { z } from "npm:zod@3";
 const num = (d = 0) => z.coerce.number().catch(d);
 const refs = z.array(z.coerce.number().int()).optional().catch(undefined);
 
+const WORKSTREAMS = [
+  "Pre-Development Control",
+  "Post-Development Audit",
+  "Fraud & Access Hardening",
+] as const;
+
 export const generatedDossierSchema = z.object({
   entityName: z.string(),
   tickerOrRegistry: z.string().optional().catch(undefined),
   sector: z.string().catch("Undisclosed"),
   jurisdiction: z.string().catch("Undisclosed"),
   segment: z
-    .enum(["GRE_SOVEREIGN", "IBM_CORPORATE", "FINANCIAL_INSTITUTION", "COMMERCIAL_SME"])
-    .catch("IBM_CORPORATE"),
+    .enum([
+      "PUBLIC_SECTOR_INFRA",
+      "FINANCIAL_CORE_SYSTEMS",
+      "TELECOM_CLOUD_ITSM",
+      "ENTERPRISE_ERP_GOV",
+    ])
+    .catch("PUBLIC_SECTOR_INFRA"),
   executiveSummary: z.string().catch(""),
   executiveBriefAudioScript: z.string().catch(""),
-  financialMetrics: z.object({
-    estimatedRevenueAED: z.string().catch("Undisclosed"),
-    ebitdaMarginPct: num(),
-    netDebtToEbitda: num(),
-    interestCoverageRatio: num(),
-    cashConversionCycleDays: num(),
-    creditRiskRating: z
-      .enum(["LOW_RISK", "MODERATE_WATCH", "ELEVATED_REVIEW"])
-      .catch("MODERATE_WATCH"),
-    sourceRefs: refs,
-  }),
-  workingCapital: z
+  auditPosture: z
     .object({
-      dsoDays: num(),
-      dioDays: num(),
-      dpoDays: num(),
-      trappedLiquidityAEDMillions: num(),
-      tradeFinanceVelocity: z.string().catch("Undisclosed"),
+      systemCriticalityTier: z.string().catch("Undisclosed"),
+      controlMaturityPct: num(),
+      openAuditFindingsRatio: num(),
+      iso20000ComplianceScore: num(),
+      meanTimeToRemediateDays: num(),
+      auditRiskPosture: z
+        .enum(["LOW_RISK", "MODERATE_WATCH", "ELEVATED_REVIEW"])
+        .catch("MODERATE_WATCH"),
       sourceRefs: refs,
     })
     .catch({
-      dsoDays: 0,
-      dioDays: 0,
-      dpoDays: 0,
-      trappedLiquidityAEDMillions: 0,
-      tradeFinanceVelocity: "Undisclosed",
+      systemCriticalityTier: "Undisclosed",
+      controlMaturityPct: 0,
+      openAuditFindingsRatio: 0,
+      iso20000ComplianceScore: 0,
+      meanTimeToRemediateDays: 0,
+      auditRiskPosture: "MODERATE_WATCH",
     }),
-  debtMaturityProfile: z
+  evidenceFlow: z
+    .object({
+      evidenceCollectionDays: num(),
+      logRetentionDays: num(),
+      findingClosureDays: num(),
+      openRiskExposureETBMillions: num(),
+      auditToolingMaturity: z.string().catch("Undisclosed"),
+      sourceRefs: refs,
+    })
+    .catch({
+      evidenceCollectionDays: 0,
+      logRetentionDays: 0,
+      findingClosureDays: 0,
+      openRiskExposureETBMillions: 0,
+      auditToolingMaturity: "Undisclosed",
+    }),
+  remediationRoadmap: z
     .array(
       z.object({
-        year: z.coerce.string(),
-        maturingDebtAEDMillions: num(),
-        instrumentType: z
-          .enum(["Syndicated Loan", "Sukuk / Bond", "Trade Facility"])
-          .catch("Syndicated Loan"),
+        period: z.coerce.string(),
+        findingsToRemediate: num(),
+        workstream: z.enum(WORKSTREAMS).catch("Pre-Development Control"),
       }),
     )
     .catch([]),
-  bondIssuanceProbabilityPct: num(),
-  corridors: z
+  preDeploymentCoveragePct: num(),
+  regulatoryCoverage: z
     .array(
       z.object({
-        corridor: z.string(),
-        flowSharePct: num(),
-        fxPair: z.string().catch(""),
-        fabHub: z.string().catch(""),
+        framework: z.string(),
+        coveragePct: num(),
+        regulator: z.string().catch(""),
+        ecosystemPartner: z.string().catch(""),
       }),
     )
     .catch([]),
-  fabDivisionRouting: z
+  eisaaPillarRouting: z
     .array(
       z.object({
-        division: z
+        pillar: z
           .enum([
-            "Global Corporate Finance",
-            "Global Transaction Banking",
-            "Global Markets",
-            "FAB Siraj Islamic Banking",
+            "Pre-Development System Audit",
+            "Post-Development & Fraud Audit",
+            "ISO 20000 & ITSM Governance",
+            "IS Auditor Capacity & Training",
           ])
-          .catch("Global Corporate Finance"),
-        recommendedProduct: z.string(),
+          .catch("Pre-Development System Audit"),
+        recommendedService: z.string(),
         triggerSignal: z.string().catch(""),
-        estimatedFeePoolAED: z.string().catch("—"),
+        estimatedRiskExposureETB: z.string().catch("—"),
         confidenceScore: num(50),
         sourceRefs: refs,
       }),
     )
     .catch([]),
-  complianceAndRiskRadar: z
+  governanceRiskRadar: z
     .array(
       z.object({
         category: z
           .enum([
-            "CBUAE / Regulatory",
-            "Sanctions & Adverse Media",
-            "FX & Corridor Risk",
-            "ESG / Transition Finance",
+            "INSA / National Cyber Policy",
+            "Proclamation 1113/2019 & Governance",
+            "Fraud & Internal Control Risk",
+            "ISO 20000 / Service Continuity",
           ])
-          .catch("CBUAE / Regulatory"),
+          .catch("INSA / National Cyber Policy"),
         severity: z.enum(["INFO", "WATCH", "CRITICAL"]).catch("INFO"),
         finding: z.string(),
         sourceIndex: z.coerce.number().int().optional().catch(undefined),
