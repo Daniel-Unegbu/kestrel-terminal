@@ -120,7 +120,7 @@ function Sandbox() {
       </div>
 
       {/* Segment tabs */}
-      <div className="mt-6 flex gap-1 overflow-x-auto border-b border-border">
+      <div className="mt-6 flex gap-1.5 overflow-x-auto rounded-2xl border border-white/[0.07] bg-white/[0.025] p-1.5 backdrop-blur-xl">
         {SEGMENTS.map((s) => {
           const p = PRESET_DOSSIERS.find((d) => d.segment === s.id)!;
           const active =
@@ -129,14 +129,18 @@ function Sandbox() {
             <button
               key={s.id}
               onClick={() => navigate({ search: { entity: p.slug } })}
-              className={`relative whitespace-nowrap px-4 py-3 text-left transition-colors ${active ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              className={`relative whitespace-nowrap rounded-xl px-4 py-2.5 text-left transition-all duration-300 ${
+                active
+                  ? "bg-white/[0.07] text-foreground shadow-[inset_0_1px_0_0_oklch(1_0_0/9%),0_10px_28px_-18px_oklch(0_0_0/90%)]"
+                  : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+              }`}
             >
               <div className="text-sm font-medium">{s.label}</div>
               <div className="mt-0.5 text-[11px] text-muted-foreground">{p.entityName}</div>
               {active && (
                 <motion.span
                   layoutId="segment-underline"
-                  className="absolute inset-x-0 -bottom-px h-0.5 bg-gold"
+                  className="absolute inset-x-4 -bottom-[7px] h-px rounded-full bg-gradient-to-r from-transparent via-gold to-transparent shadow-[0_0_12px_1px_oklch(0.8_0.13_90/60%)]"
                   transition={{ type: "spring", stiffness: 500, damping: 40 }}
                 />
               )}
@@ -147,7 +151,10 @@ function Sandbox() {
 
       {/* Live search */}
       <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_auto]">
-        <form onSubmit={runSearch} className="panel flex items-center gap-2 p-2">
+        <form
+          onSubmit={runSearch}
+          className="panel flex items-center gap-2 p-2 transition-shadow duration-500 focus-within:shadow-[0_0_0_1px_oklch(0.8_0.13_90/30%),0_0_44px_-14px_oklch(0.8_0.13_90/45%)]"
+        >
           <Search className="ml-2 size-4 shrink-0 text-muted-foreground" />
           <input
             ref={inputRef}
@@ -157,7 +164,7 @@ function Sandbox() {
             className="h-10 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             maxLength={120}
           />
-          <label className="hidden cursor-pointer items-center gap-2 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground sm:flex">
+          <label className="hidden cursor-pointer items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-gold/35 hover:text-foreground sm:flex">
             <input
               type="checkbox"
               checked={deep}
@@ -169,7 +176,7 @@ function Sandbox() {
           <button
             type="submit"
             disabled={loading || query.trim().length < 2}
-            className="flex h-10 items-center gap-2 rounded-md bg-gold-gradient px-4 text-sm font-semibold text-gold-foreground shadow-gold transition hover:brightness-110 disabled:opacity-50"
+            className="sheen flex h-10 items-center gap-2 rounded-full bg-gold-gradient px-5 text-sm font-semibold text-gold-foreground shadow-gold transition-all duration-300 hover:-translate-y-px hover:brightness-110 hover:shadow-[0_0_40px_-8px_oklch(0.8_0.13_90/75%)] disabled:opacity-50"
           >
             {loading ? <Loader2 className="size-4 animate-spin" /> : <Zap className="size-4" />}
             Generate dossier
@@ -182,7 +189,11 @@ function Sandbox() {
               <button
                 key={r.entity_slug}
                 onClick={() => navigate({ search: { entity: r.entity_slug } })}
-                className={`whitespace-nowrap rounded border px-2 py-1 text-xs transition-colors ${entity === r.entity_slug ? "border-gold/50 text-gold" : "border-border text-muted-foreground hover:text-foreground"}`}
+                className={`whitespace-nowrap rounded-full border px-2.5 py-1 text-xs transition-all duration-300 ${
+                  entity === r.entity_slug
+                    ? "border-gold/50 bg-gold/10 text-gold shadow-[0_0_22px_-8px_oklch(0.8_0.13_90/70%)]"
+                    : "border-white/10 bg-white/[0.03] text-muted-foreground hover:border-white/20 hover:text-foreground"
+                }`}
               >
                 {r.entity_name}
               </button>

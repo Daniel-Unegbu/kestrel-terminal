@@ -38,7 +38,7 @@ function Module({
   className?: string;
 }) {
   return (
-    <motion.section {...reveal(index)} className={`panel p-4 ${className}`}>
+    <motion.section {...reveal(index)} className={`panel glow-hover p-4 ${className}`}>
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold">{title}</h3>
         <span className="eyebrow !text-[10px]">{code}</span>
@@ -60,7 +60,7 @@ function Metric({
   small?: boolean;
 }) {
   return (
-    <div className="rounded-md border border-border bg-background/40 p-2.5">
+    <div className="rounded-lg border border-white/[0.07] bg-white/[0.03] p-2.5 transition-colors duration-300 hover:border-gold/25 hover:bg-white/[0.05]">
       <div className="eyebrow !text-[9.5px]">{label}</div>
       <div
         className={`num mt-1 ${small ? "text-[13px] leading-tight" : "text-lg"} ${tone ?? "text-foreground"}`}
@@ -111,13 +111,13 @@ export function DossierView({
     <div className="space-y-4">
       {/* Header */}
       <motion.div {...reveal(0)} className="grid gap-4 lg:grid-cols-[1fr_380px]">
-        <div className="panel p-5">
+        <div className="panel top-hairline p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="eyebrow rounded border border-border px-1.5 py-0.5 !text-[10px]">
+            <span className="eyebrow rounded-full border border-white/12 bg-white/[0.04] px-2 py-0.5 !text-[10px]">
               {seg?.label}
             </span>
             <span
-              className={`num rounded border px-1.5 py-0.5 text-[10px] ${RATING_STYLE[fm.auditRiskPosture]}`}
+              className={`num rounded-full border px-2 py-0.5 text-[10px] ${RATING_STYLE[fm.auditRiskPosture]}`}
             >
               {fm.auditRiskPosture}
             </span>

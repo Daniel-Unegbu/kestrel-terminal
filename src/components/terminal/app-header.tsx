@@ -17,11 +17,13 @@ export function AppHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { setPaletteOpen, setDeskOpen } = useTerminal();
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl no-print">
+    <header className="glass-bar sticky top-0 z-40 border-b border-white/[0.07] shadow-[0_20px_50px_-38px_oklch(0_0_0/95%)] no-print">
       <MacroTicker />
       <div className="mx-auto flex h-14 max-w-[1440px] items-center gap-6 px-4 lg:px-6">
-        <Link to="/" className="flex items-center gap-2.5">
-          <KestrelMark />
+        <Link to="/" className="group flex items-center gap-2.5">
+          <span className="relative flex size-9 items-center justify-center rounded-xl border border-gold/25 bg-gold/[0.06] transition-all duration-500 group-hover:border-gold/50 group-hover:bg-gold/[0.12] group-hover:shadow-[0_0_28px_-6px_oklch(0.8_0.13_90/45%)]">
+            <KestrelMark />
+          </span>
           <div className="leading-none">
             <div className="text-[15px] font-semibold tracking-tight">Kestrel Terminal</div>
             <div className="eyebrow !text-[9px] mt-1">{EISAA_COPY.headerSubtitle}</div>
@@ -34,14 +36,18 @@ export function AppHeader() {
               <Link
                 key={n.to}
                 to={n.to}
-                className={`relative px-3 py-4 text-sm transition-colors ${active ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`relative rounded-lg px-3 py-2 text-sm transition-all duration-300 ${
+                  active
+                    ? "bg-white/[0.06] text-foreground shadow-[inset_0_1px_0_0_oklch(1_0_0/8%)]"
+                    : "text-muted-foreground hover:bg-white/[0.035] hover:text-foreground"
+                }`}
               >
                 <span className="num mr-1.5 text-[10px] text-muted-foreground">{n.pillar}</span>
                 {n.label}
                 {active && (
                   <motion.span
                     layoutId="nav-underline"
-                    className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-gold"
+                    className="absolute inset-x-3 -bottom-[7px] h-px rounded-full bg-gradient-to-r from-transparent via-gold to-transparent shadow-[0_0_12px_1px_oklch(0.8_0.13_90/60%)]"
                     transition={{ type: "spring", stiffness: 500, damping: 40 }}
                   />
                 )}
@@ -52,26 +58,28 @@ export function AppHeader() {
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={() => setDeskOpen(true)}
-            className="hidden items-center gap-2 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-azure/50 hover:text-azure sm:flex"
+            className="hidden items-center gap-2 rounded-full border border-azure/25 bg-azure/[0.07] px-3 py-1.5 text-xs text-azure/90 transition-all duration-300 hover:border-azure/60 hover:bg-azure/[0.14] hover:shadow-[0_0_26px_-8px_oklch(0.75_0.14_233/70%)] sm:flex"
           >
             <Mic className="size-3.5" /> AuditDesk
           </button>
           <button
             onClick={() => setPaletteOpen(true)}
-            className="flex items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-gold/50 hover:text-foreground"
+            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs text-muted-foreground transition-all duration-300 hover:border-gold/45 hover:bg-white/[0.09] hover:text-foreground hover:shadow-[0_0_26px_-8px_oklch(0.8_0.13_90/60%)]"
           >
             <Command className="size-3.5" />
             <span className="hidden sm:inline">Jump to…</span>
-            <kbd className="num rounded border border-border px-1 text-[10px]">⌘K</kbd>
+            <kbd className="num rounded border border-white/12 bg-white/[0.04] px-1 text-[10px]">
+              ⌘K
+            </kbd>
           </button>
         </div>
       </div>
-      <nav className="flex gap-1 overflow-x-auto border-t border-border px-2 md:hidden">
+      <nav className="flex gap-1 overflow-x-auto border-t border-white/[0.06] px-2 md:hidden">
         {NAV.map((n) => (
           <Link
             key={n.to}
             to={n.to}
-            className="whitespace-nowrap px-3 py-2.5 text-xs text-muted-foreground"
+            className="whitespace-nowrap rounded-md px-3 py-2.5 text-xs text-muted-foreground transition-colors"
             activeProps={{ className: "text-gold" }}
             activeOptions={{ exact: n.to === "/" }}
           >

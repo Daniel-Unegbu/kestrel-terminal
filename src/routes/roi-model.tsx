@@ -140,7 +140,7 @@ function RoiModel() {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[380px_1fr]">
-        <div className="panel space-y-7 p-5">
+        <div className="panel top-hairline space-y-7 p-5">
           {SLIDERS.map((s) => (
             <div key={s.key}>
               <div className="flex items-baseline justify-between gap-3">
@@ -197,7 +197,7 @@ function RoiModel() {
             />
           </div>
 
-          <div className="panel p-5">
+          <div className="panel top-hairline p-5">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-semibold">
@@ -389,9 +389,22 @@ function OutputCard({
   gold?: boolean;
 }) {
   return (
-    <div className={`panel p-5 ${gold ? "shadow-gold" : ""}`}>
+    <div
+      className={`panel glow-hover top-hairline group relative overflow-hidden p-5 ${
+        gold ? "shadow-gold !border-gold/35" : ""
+      }`}
+    >
+      {gold && (
+        <span className="pointer-events-none absolute -right-10 -top-10 size-32 rounded-full bg-gold/15 blur-3xl" />
+      )}
       <div className="eyebrow !text-[10px]">{eyebrow}</div>
-      <div className={`num mt-2 text-3xl ${gold ? "text-gold" : "text-foreground"}`}>{value}</div>
+      <div
+        className={`num mt-2 text-3xl transition-all duration-500 ${
+          gold ? "text-gold drop-shadow-[0_0_22px_oklch(0.8_0.13_90/35%)]" : "text-foreground"
+        }`}
+      >
+        {value}
+      </div>
       <div className="mt-2 text-xs text-muted-foreground">{sub}</div>
     </div>
   );

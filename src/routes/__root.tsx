@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { EISAA_COPY } from "../lib/eisaa-references";
 import { Toaster } from "@/components/ui/sonner";
 import { AppHeader } from "@/components/terminal/app-header";
+import { AmbientBackdrop } from "@/components/terminal/ambient-backdrop";
 import { CommandPalette } from "@/components/terminal/command-palette";
 import { DealDeskDock } from "@/components/terminal/deal-desk";
 import { TerminalProvider } from "@/components/terminal/terminal-context";
@@ -144,27 +145,30 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TerminalProvider>
-        <div className="flex min-h-screen flex-col">
-          <AppHeader />
-          <main className="flex-1">
-            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
-          </main>
-          <footer className="border-t border-border no-print">
-            <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-2 px-4 py-4 text-[11px] text-muted-foreground lg:px-6">
-              <span>
-                Kestrel Terminal · IS Audit, IT Governance & Cyber Risk Intelligence prototype
-              </span>
-              <span className="num">{EISAA_COPY.footerFigures}</span>
-            </div>
-          </footer>
-        </div>
-        <CommandPalette />
-        <DealDeskDock />
-        <Toaster />
-      </TerminalProvider>
-    </QueryClientProvider>
+    <>
+      <AmbientBackdrop />
+      <QueryClientProvider client={queryClient}>
+        <TerminalProvider>
+          <div className="relative flex min-h-screen flex-col">
+            <AppHeader />
+            <main className="flex-1">
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+            </main>
+            <footer className="border-t border-white/[0.06] no-print">
+              <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-2 px-4 py-4 text-[11px] text-muted-foreground lg:px-6">
+                <span>
+                  Kestrel Terminal · IS Audit, IT Governance & Cyber Risk Intelligence prototype
+                </span>
+                <span className="num">{EISAA_COPY.footerFigures}</span>
+              </div>
+            </footer>
+          </div>
+          <CommandPalette />
+          <DealDeskDock />
+          <Toaster />
+        </TerminalProvider>
+      </QueryClientProvider>
+    </>
   );
 }

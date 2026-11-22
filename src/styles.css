@@ -9,9 +9,9 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Kestrel Terminal design system — "Private bank meets terminal".
- * Obsidian canvas, slate cards, hairline borders, sovereign gold for capital,
- * azure for telemetry, emerald for healthy signals, crimson for risk.
+ * Kestrel Terminal design system — "private bank meets terminal".
+ * Obsidian canvas, frosted glass cards, hairline borders, sovereign gold for
+ * capital, azure for telemetry, emerald for healthy signals, crimson for risk.
  */
 
 @theme inline {
@@ -70,7 +70,7 @@
 }
 
 :root {
-  --radius: 0.375rem;
+  --radius: 0.75rem;
   /* #060911 obsidian canvas, #0C1220 slate cards */
   --background: oklch(0.135 0.016 268);
   --foreground: oklch(0.94 0.008 260);
@@ -115,10 +115,33 @@
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.77 0.13 88 / 60%);
 
+  /* Frosted-glass surface tokens */
+  --glass-bg: linear-gradient(
+    155deg,
+    oklch(0.28 0.032 264 / 58%) 0%,
+    oklch(0.19 0.024 265 / 40%) 46%,
+    oklch(0.15 0.02 268 / 52%) 100%
+  );
+  --glass-bg-strong: linear-gradient(
+    160deg,
+    oklch(0.3 0.036 265 / 78%) 0%,
+    oklch(0.18 0.024 266 / 66%) 55%,
+    oklch(0.14 0.02 268 / 78%) 100%
+  );
+  --glass-border: oklch(1 0 0 / 11%);
+  --glass-highlight:
+    inset 0 1px 0 0 oklch(1 0 0 / 10%), inset 0 -1px 0 0 oklch(0 0 0 / 30%),
+    inset 0 0 0 1px oklch(1 0 0 / 2%);
+  --glass-shadow: 0 26px 60px -34px oklch(0 0 0 / 88%);
+  --glow-gold:
+    0 0 0 1px oklch(0.77 0.13 88 / 26%), 0 18px 46px -16px oklch(0.77 0.13 88 / 30%),
+    0 0 70px -24px oklch(0.85 0.14 92 / 45%);
+  --glow-azure: 0 0 0 1px oklch(0.75 0.14 233 / 26%), 0 18px 46px -16px oklch(0.75 0.14 233 / 30%);
+
   --gradient-canvas:
     radial-gradient(1200px 600px at 85% -10%, oklch(0.77 0.13 88 / 7%), transparent 60%),
     radial-gradient(900px 500px at -10% 10%, oklch(0.75 0.14 233 / 6%), transparent 60%);
-  --gradient-gold: linear-gradient(135deg, oklch(0.83 0.12 92), oklch(0.7 0.13 80));
+  --gradient-gold: linear-gradient(135deg, oklch(0.86 0.12 94), oklch(0.72 0.13 82) 55%, oklch(0.78 0.12 90));
   --gradient-card: linear-gradient(180deg, oklch(0.19 0.026 263), oklch(0.17 0.022 263));
   --shadow-panel: 0 1px 0 0 oklch(1 0 0 / 4%) inset, 0 20px 40px -24px oklch(0 0 0 / 70%);
   --shadow-gold: 0 0 0 1px oklch(0.77 0.13 88 / 35%), 0 10px 30px -12px oklch(0.77 0.13 88 / 35%);
@@ -130,6 +153,7 @@
   }
   html {
     color-scheme: dark;
+    scroll-behavior: smooth;
   }
   body {
     background-color: var(--color-background);
@@ -138,13 +162,40 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
   }
   ::selection {
-    background: oklch(0.77 0.13 88 / 30%);
+    background: oklch(0.77 0.13 88 / 32%);
+    color: oklch(0.99 0.01 95);
+  }
+  :focus-visible {
+    outline: 2px solid oklch(0.77 0.13 88 / 70%);
+    outline-offset: 2px;
+  }
+  /* Slim, glassy scrollbars. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(1 0 0 / 14%) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 9999px;
+    background-color: oklch(1 0 0 / 14%);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: oklch(0.77 0.13 88 / 45%);
   }
 }
 
@@ -156,10 +207,39 @@
 }
 
 @utility panel {
-  background-image: var(--gradient-card);
-  border: 1px solid var(--color-border);
+  position: relative;
+  background-image: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-panel);
+  box-shadow: var(--glass-highlight), var(--glass-shadow);
+}
+
+@utility glass {
+  background-image: var(--glass-bg);
+  backdrop-filter: blur(22px) saturate(155%);
+  -webkit-backdrop-filter: blur(22px) saturate(155%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight), var(--glass-shadow);
+}
+
+@utility glass-strong {
+  background-image: var(--glass-bg-strong);
+  backdrop-filter: blur(34px) saturate(170%);
+  -webkit-backdrop-filter: blur(34px) saturate(170%);
+  border: 1px solid oklch(1 0 0 / 14%);
+  box-shadow: var(--glass-highlight), 0 34px 80px -36px oklch(0 0 0 / 92%);
+}
+
+@utility glass-bar {
+  background-image: linear-gradient(
+    180deg,
+    oklch(0.14 0.02 266 / 78%) 0%,
+    oklch(0.125 0.018 268 / 58%) 100%
+  );
+  backdrop-filter: blur(26px) saturate(165%);
+  -webkit-backdrop-filter: blur(26px) saturate(165%);
 }
 
 @utility eyebrow {
@@ -183,6 +263,14 @@
 
 @utility shadow-gold {
   box-shadow: var(--shadow-gold);
+}
+
+@utility glow-gold {
+  box-shadow: var(--glow-gold);
+}
+
+@utility glow-azure {
+  box-shadow: var(--glow-azure);
 }
 
 @utility grid-lines {
@@ -224,6 +312,269 @@
   animation: pulse-dot 1.6s ease-in-out infinite;
 }
 
+/* ------------------------------------------------------------------ *
+ * Hyper-visual layer: hover glows, sheen, ambient gold glass backdrop
+ * ------------------------------------------------------------------ */
+
+/* Interactive surfaces lift and bloom gold on hover. Only touches the
+   box-shadow, so it composes with existing border/colour hover utilities. */
+.glow-hover {
+  transition:
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.glow-hover:hover {
+  box-shadow:
+    var(--glass-highlight),
+    0 0 0 1px oklch(0.8 0.13 90 / 22%),
+    0 28px 64px -30px oklch(0 0 0 / 90%),
+    0 0 52px -14px oklch(0.8 0.13 90 / 30%);
+}
+
+.lift-hover {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lift-hover:hover {
+  transform: translateY(-3px);
+}
+
+/* A diagonal light sweep, used on the primary gold button. */
+.sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    oklch(1 0 0 / 42%) 48%,
+    oklch(1 0 0 / 10%) 54%,
+    transparent 62%
+  );
+  transform: translateX(-120%) rotate(4deg);
+  transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.sheen:hover::after {
+  transform: translateX(120%) rotate(4deg);
+}
+
+/* Soft bloom behind gold display text. */
+.text-glow {
+  filter: drop-shadow(0 0 26px oklch(0.8 0.13 90 / 38%));
+}
+
+/* Fine gold hairline on the top edge of a card. */
+.top-hairline::before {
+  content: "";
+  position: absolute;
+  inset-inline: 12%;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(0.85 0.13 92 / 55%),
+    transparent
+  );
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* ---- Ambient backdrop ------------------------------------------------ */
+
+.kx-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.kx-ambient__base {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 85% at 50% -18%, oklch(0.24 0.034 265 / 85%), transparent 62%),
+    linear-gradient(180deg, oklch(0.105 0.014 268) 0%, oklch(0.135 0.016 268) 42%, oklch(0.095 0.013 270) 100%);
+}
+
+.kx-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.kx-orb--gold {
+  width: 52vw;
+  height: 52vw;
+  min-width: 420px;
+  min-height: 420px;
+  top: -20vw;
+  right: -12vw;
+  opacity: 0.85;
+  background: radial-gradient(
+    circle at 35% 35%,
+    oklch(0.88 0.15 94 / 58%),
+    oklch(0.74 0.13 82 / 26%) 48%,
+    transparent 72%
+  );
+  animation: kx-drift-a 28s ease-in-out infinite;
+}
+
+.kx-orb--azure {
+  width: 44vw;
+  height: 44vw;
+  min-width: 360px;
+  min-height: 360px;
+  top: 8vh;
+  left: -16vw;
+  opacity: 0.6;
+  background: radial-gradient(
+    circle at 60% 40%,
+    oklch(0.78 0.15 233 / 42%),
+    oklch(0.6 0.12 240 / 16%) 52%,
+    transparent 74%
+  );
+  animation: kx-drift-b 34s ease-in-out infinite;
+}
+
+.kx-orb--emerald {
+  width: 38vw;
+  height: 38vw;
+  min-width: 300px;
+  min-height: 300px;
+  bottom: -18vw;
+  left: 26vw;
+  opacity: 0.42;
+  background: radial-gradient(
+    circle at 50% 50%,
+    oklch(0.76 0.15 163 / 34%),
+    oklch(0.6 0.12 165 / 12%) 55%,
+    transparent 76%
+  );
+  animation: kx-drift-c 40s ease-in-out infinite;
+}
+
+/* Gold glassmorphism light sweep across the upper canvas. */
+.kx-streak {
+  position: absolute;
+  top: -18vh;
+  left: 50%;
+  width: 130vw;
+  height: 70vh;
+  transform: translateX(-50%) rotate(-9deg);
+  background: linear-gradient(
+    100deg,
+    transparent 32%,
+    oklch(0.88 0.13 92 / 13%) 46%,
+    oklch(0.94 0.08 95 / 17%) 50%,
+    oklch(0.85 0.12 90 / 9%) 55%,
+    transparent 68%
+  );
+  filter: blur(46px);
+  animation: kx-sheen 22s ease-in-out infinite;
+}
+
+.kx-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(oklch(1 0 0 / 3.5%) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(1 0 0 / 3.5%) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(125% 95% at 50% 0%, #000 18%, transparent 76%);
+  -webkit-mask-image: radial-gradient(125% 95% at 50% 0%, #000 18%, transparent 76%);
+}
+
+.kx-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+.kx-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    125% 85% at 50% 42%,
+    transparent 42%,
+    oklch(0.06 0.01 270 / 82%) 100%
+  );
+}
+
+/* Pointer spotlight: a faint gold torch that follows the cursor. */
+.kx-cursor {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    540px circle at var(--kx-x, 50%) var(--kx-y, 12%),
+    oklch(0.86 0.13 92 / 8%),
+    transparent 62%
+  );
+  transition: background 0.18s linear;
+}
+
+@keyframes kx-drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-5%, 6%, 0) scale(1.08); }
+}
+@keyframes kx-drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.04); }
+  50% { transform: translate3d(7%, -5%, 0) scale(0.94); }
+}
+@keyframes kx-drift-c {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(0.98); }
+  50% { transform: translate3d(-6%, -7%, 0) scale(1.1); }
+}
+@keyframes kx-sheen {
+  0%, 100% { opacity: 0.55; transform: translateX(-50%) rotate(-9deg) translateY(0); }
+  50% { opacity: 1; transform: translateX(-46%) rotate(-9deg) translateY(4vh); }
+}
+
+/* Browsers without backdrop-filter get a denser surface instead of mush. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .panel,
+  .glass,
+  .glass-strong,
+  .glass-bar {
+    background-image: linear-gradient(160deg, oklch(0.21 0.026 264), oklch(0.16 0.02 267));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .kx-orb,
+  .kx-streak,
+  .animate-ticker,
+  .animate-flow,
+  .animate-wave,
+  .animate-pulse-dot {
+    animation: none !important;
+  }
+  .kx-cursor {
+    display: none;
+  }
+  .sheen::after {
+    display: none;
+  }
+  .lift-hover:hover {
+    transform: none;
+  }
+}
+
 @media print {
   html, body {
     background: #fff !important;
@@ -231,6 +582,14 @@
     color: #111 !important;
   }
   .no-print { display: none !important; }
+  .kx-ambient { display: none !important; }
+  .panel,
+  .glass,
+  .glass-strong {
+    background: #fff !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
   /* Print only the open term-sheet dialog, not the terminal chrome behind it. */
   body > *:not(:has([role="dialog"])) { display: none !important; }
   [data-slot="dialog-overlay"] { display: none !important; }

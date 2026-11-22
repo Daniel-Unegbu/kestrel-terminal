@@ -139,20 +139,20 @@ function Architecture() {
       <h1 className="mt-2 text-3xl font-semibold">Sovereign ICT governance & audit architecture</h1>
 
       {/* Topology */}
-      <section className="panel mt-6 overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4">
+      <section className="panel top-hairline mt-6 overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.07] p-4">
           <h2 className="text-sm font-semibold">Sovereign audit topology</h2>
-          <div className="relative flex rounded-md border border-border p-0.5">
+          <div className="relative flex rounded-full border border-white/12 bg-white/[0.04] p-0.5 backdrop-blur-md">
             {(Object.keys(PHASES) as Array<keyof typeof PHASES>).map((k) => (
               <button
                 key={k}
                 onClick={() => setPhase(k)}
-                className={`relative z-10 px-3 py-1.5 text-xs transition-colors ${phase === k ? "text-gold-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`relative z-10 rounded-full px-3.5 py-1.5 text-xs transition-colors ${phase === k ? "text-gold-foreground" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {phase === k && (
                   <motion.span
                     layoutId="phase-pill"
-                    className="absolute inset-0 -z-10 rounded bg-gold"
+                    className="absolute inset-0 -z-10 rounded-full bg-gold-gradient shadow-[0_0_26px_-6px_oklch(0.8_0.13_90/70%)]"
                     transition={{ type: "spring", stiffness: 500, damping: 40 }}
                   />
                 )}
@@ -217,20 +217,23 @@ function Architecture() {
             <button
               key={c.title}
               onClick={() => setActive(i)}
-              className={`panel p-4 text-left transition-colors ${active === i ? "!border-gold/50 shadow-gold" : "hover:border-hairline-strong"}`}
+              className={`panel glow-hover p-4 text-left ${
+                active === i ? "!border-gold/50 shadow-gold" : "hover:border-white/20"
+              }`}
             >
               <div className="flex items-center justify-between">
                 <c.icon
-                  className={`size-5 ${active === i ? "text-gold" : "text-muted-foreground"}`}
+                  className={`size-5 transition-all duration-300 ${active === i ? "text-gold drop-shadow-[0_0_10px_oklch(0.8_0.13_90/70%)]" : "text-muted-foreground"}`}
                 />
-                <span className="num rounded border border-border px-1.5 text-[10px] text-muted-foreground">
+                <span className="num rounded-full border border-white/12 bg-white/[0.04] px-2 text-[10px] text-muted-foreground">
                   {c.tag}
                 </span>
               </div>
               <div className="mt-3 font-medium">{c.title}</div>
               <p className="mt-1.5 text-sm text-muted-foreground">{c.body}</p>
               <div className="mt-3 flex items-center gap-1.5 text-[11px] text-emerald">
-                <span className="size-1.5 rounded-full bg-emerald" /> Control designed for pilot
+                <span className="size-1.5 rounded-full bg-emerald shadow-[0_0_8px_oklch(0.7_0.15_163/90%)]" />{" "}
+                Control designed for pilot
               </div>
             </button>
           ))}
@@ -256,7 +259,7 @@ function Architecture() {
               <span
                 className={`relative z-10 block size-3.5 rounded-full border-2 border-background ${i === 0 ? "bg-gold" : i === 1 ? "bg-azure" : "bg-emerald"}`}
               />
-              <div className="panel mt-4 p-4">
+              <div className="panel glow-hover mt-4 p-4">
                 <div className="num text-xs text-gold">{r.weeks}</div>
                 <div className="mt-1 font-medium">{r.title}</div>
                 <p className="mt-1.5 text-sm text-muted-foreground">{r.body}</p>
@@ -289,9 +292,12 @@ function Node({
   tone: keyof typeof TONE;
 }) {
   return (
-    <div className={`rounded-lg border bg-card p-4 ${TONE[tone].border}`}>
-      <Icon className={`size-5 ${TONE[tone].text}`} />
-      <div className="mt-2 font-medium">{title}</div>
+    <div
+      className={`group relative overflow-hidden rounded-xl border bg-white/[0.03] p-4 backdrop-blur-lg transition-all duration-500 hover:bg-white/[0.06] hover:shadow-[0_0_44px_-18px_currentColor] ${TONE[tone].border} ${TONE[tone].text}`}
+    >
+      <span className="pointer-events-none absolute -right-8 -top-8 size-24 rounded-full bg-current opacity-[0.06] blur-2xl" />
+      <Icon className={`size-5 ${TONE[tone].text} drop-shadow-[0_0_10px_currentColor]`} />
+      <div className="mt-2 font-medium text-foreground">{title}</div>
       <div className="text-xs text-muted-foreground">{sub}</div>
       <ul className="mt-3 space-y-1.5">
         {items.map((it) => (
@@ -300,7 +306,7 @@ function Node({
             layout
             initial={{ opacity: 0, x: -6 }}
             animate={{ opacity: 1, x: 0 }}
-            className="num rounded border border-border bg-background/50 px-2 py-1 text-[11px] leading-relaxed"
+            className="num rounded-md border border-white/[0.07] bg-white/[0.04] px-2 py-1 text-[11px] leading-relaxed text-foreground/90"
           >
             {it}
           </motion.li>

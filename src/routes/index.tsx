@@ -87,13 +87,16 @@ function CommandCenter() {
           transition={{ duration: 0.5 }}
         >
           <div className="eyebrow flex items-center gap-2">
-            <span className="size-1.5 rounded-full bg-gold" /> IS Audit, IT Governance & Cyber Risk
-            Intelligence
+            <span className="relative flex size-1.5">
+              <span className="absolute inset-0 rounded-full bg-gold" />
+              <span className="absolute inset-0 rounded-full bg-gold blur-[4px] opacity-80" />
+            </span>
+            IS Audit, IT Governance & Cyber Risk Intelligence
           </div>
           <h1 className="mt-4 text-4xl font-semibold leading-[1.05] md:text-6xl">
             Walk into every system audit with{" "}
-            <span className="text-gold-gradient">control gaps</span> and governance risks already
-            mapped.
+            <span className="text-gold-gradient text-glow">control gaps</span> and governance risks
+            already mapped.
           </h1>
           <p className="mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">
             Kestrel turns live governance intelligence into cited audit dossiers for EISAA members —
@@ -115,10 +118,17 @@ function CommandCenter() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="panel grid grid-cols-2 gap-px overflow-hidden !p-0"
+          className="panel top-hairline grid grid-cols-2 gap-px overflow-hidden !p-0"
         >
           {KPIS.map((k, i) => (
-            <div key={k.label} className={`bg-card p-4 ${i === 0 ? "col-span-2" : ""}`}>
+            <div
+              key={k.label}
+              className={`relative p-4 transition-colors duration-500 hover:bg-white/[0.04] ${
+                i === 0
+                  ? "col-span-2 bg-gradient-to-br from-gold/[0.09] to-transparent"
+                  : "bg-white/[0.015]"
+              }`}
+            >
               <div className="eyebrow !text-[10px]">{k.label}</div>
               <div className={`num mt-1.5 ${i === 0 ? "text-2xl text-gold" : "text-xl"}`}>
                 {k.value}
@@ -131,7 +141,7 @@ function CommandCenter() {
 
       {/* Problem thesis */}
       <section className="mt-14 grid gap-4 lg:grid-cols-3">
-        <div className="panel p-6 lg:col-span-2">
+        <div className="panel glow-hover p-6 lg:col-span-2">
           <div className="eyebrow">Executive problem thesis</div>
           <h2 className="mt-3 text-2xl font-semibold md:text-3xl">
             IS auditors spend half a day assembling what the institution already holds in its
@@ -145,7 +155,7 @@ function CommandCenter() {
             that surface after deployment rather than before.
           </p>
         </div>
-        <div className="panel flex flex-col justify-between p-6">
+        <div className="panel glow-hover flex flex-col justify-between p-6">
           <Clock className="size-5 text-crimson" />
           <div>
             <div className="num text-5xl text-foreground">4–6 hrs</div>
@@ -153,7 +163,7 @@ function CommandCenter() {
               manual audit scoping per system review, per auditor
             </div>
           </div>
-          <div className="mt-6 border-t border-border pt-4">
+          <div className="mt-6 border-t border-white/[0.07] pt-4">
             <div className="num text-3xl text-emerald">~8 sec</div>
             <div className="mt-1 text-sm text-muted-foreground">
               to a cited Kestrel dossier on any named system
@@ -204,10 +214,10 @@ function CommandCenter() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.12 }}
-              className="panel relative z-10 p-5 transition-colors hover:border-hairline-strong"
+              className="panel glow-hover group relative z-10 p-5"
             >
               <div
-                className={`flex size-10 items-center justify-center rounded-md border bg-background ${n.ring}`}
+                className={`flex size-10 items-center justify-center rounded-xl border bg-white/[0.03] backdrop-blur-md transition-all duration-500 group-hover:shadow-[0_0_28px_-8px_currentColor] ${n.ring}`}
               >
                 <n.icon className={`size-5 ${n.tone}`} />
               </div>
@@ -230,13 +240,14 @@ function CommandCenter() {
             <Link
               key={p.n}
               to={p.to}
-              className="panel group p-4 transition-colors hover:border-gold/40"
+              className="panel glow-hover lift-hover group relative overflow-hidden p-4 hover:border-gold/40"
             >
+              <span className="pointer-events-none absolute -right-6 -top-6 size-16 rounded-full bg-gold/10 blur-2xl transition-opacity duration-500 group-hover:opacity-100 opacity-0" />
               <div className="num text-xs text-gold">{p.n}</div>
               <div className="mt-2 font-medium">{p.t}</div>
               <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
                 {p.d}{" "}
-                <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-gold" />
               </div>
             </Link>
           ))}
@@ -261,8 +272,8 @@ function CommandCenter() {
             d: "Brief aloud between sites; ask follow-ups hands-free.",
           },
         ].map((f) => (
-          <div key={f.t} className="flex gap-3 border-t border-border pt-4">
-            <f.icon className="mt-0.5 size-4 shrink-0 text-gold" />
+          <div key={f.t} className="flex gap-3 border-t border-white/[0.07] pt-4">
+            <f.icon className="mt-0.5 size-4 shrink-0 text-gold drop-shadow-[0_0_10px_oklch(0.8_0.13_90/55%)]" />
             <div>
               <div className="text-sm font-medium">{f.t}</div>
               <div className="mt-1 text-sm text-muted-foreground">{f.d}</div>

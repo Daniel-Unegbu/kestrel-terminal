@@ -160,6 +160,18 @@ export function DealDeskDock() {
     };
   }, [deskOpen, startRecording, stopRecording]);
 
+  // Escape closes the dock, unless a modal dialog is layered on top of it.
+  useEffect(() => {
+    if (!deskOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (document.querySelector("[role=dialog]")) return;
+      setDeskOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [deskOpen, setDeskOpen]);
+
   const busy = phase === "transcribing" || phase === "thinking";
 
   return (
@@ -171,21 +183,24 @@ export function DealDeskDock() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
             transition={{ duration: 0.2 }}
-            className="panel w-[min(420px,calc(100vw-2.5rem))] overflow-hidden !bg-popover"
+            className="glass-strong relative w-[min(430px,calc(100vw-2.5rem))] overflow-hidden rounded-2xl !bg-popover"
           >
-            <div className="flex items-center justify-between border-b border-border px-4 py-3">
-              <div>
+            <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
+            <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-3">
+              <div className="min-w-0">
                 <div className="text-sm font-semibold">Ask the AuditDesk</div>
                 <div className="eyebrow !text-[10px] mt-0.5 truncate">
                   Context · {activeDossier.entityName}
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setDeskOpen(false)}
                 aria-label="Close AuditDesk"
-                className="text-muted-foreground hover:text-foreground"
+                title="Close AuditDesk"
+                className="group flex size-8 shrink-0 items-center justify-center rounded-full border border-white/12 bg-white/[0.06] text-muted-foreground transition-all duration-300 hover:border-crimson/50 hover:bg-crimson/15 hover:text-crimson hover:shadow-[0_0_22px_-4px_oklch(0.65_0.22_16/55%)] active:scale-95"
               >
-                <X className="size-4" />
+                <X className="size-4 transition-transform duration-300 group-hover:rotate-90" />
               </button>
             </div>
             <div className="max-h-[50vh] space-y-3 overflow-y-auto p-4">
@@ -195,13 +210,13 @@ export function DealDeskDock() {
                     setQuestion(SUGGESTED);
                     void submit(SUGGESTED);
                   }}
-                  className="w-full rounded-md border border-dashed border-hairline-strong p-3 text-left text-[13px] text-muted-foreground hover:border-gold/50 hover:text-foreground"
+                  className="group w-full rounded-xl border border-dashed border-white/15 bg-white/[0.025] p-3 text-left text-[13px] text-muted-foreground transition-all duration-300 hover:border-gold/50 hover:bg-gold/[0.05] hover:text-foreground hover:shadow-[0_0_34px_-14px_oklch(0.8_0.13_90/60%)]"
                 >
                   “{SUGGESTED}”
                 </button>
               )}
               {question && (
-                <div className="ml-8 rounded-md bg-elevated p-3 text-[13px]">
+                <div className="ml-8 rounded-xl border border-white/[0.07] bg-white/[0.04] p-3 text-[13px]">
                   <div className="eyebrow !text-[9.5px] mb-1">You asked</div>
                   {question}
                 </div>
@@ -220,7 +235,7 @@ export function DealDeskDock() {
                 <motion.div
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-md border border-gold/30 bg-gold/5 p-3"
+                  className="rounded-xl border border-gold/30 bg-gradient-to-br from-gold/[0.1] to-gold/[0.03] p-3 shadow-[0_0_40px_-18px_oklch(0.8_0.13_90/60%)]"
                 >
                   <div className="mb-1.5 flex items-center justify-between">
                     <span className="eyebrow !text-[9.5px] text-gold">
@@ -251,19 +266,19 @@ export function DealDeskDock() {
                 e.preventDefault();
                 void submit(question);
               }}
-              className="flex items-center gap-2 border-t border-border p-3"
+              className="flex items-center gap-2 border-t border-white/[0.07] p-3"
             >
               <input
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="Type a question, or hold Space to talk"
-                className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm outline-none placeholder:text-muted-foreground focus:border-gold/50"
+                className="h-9 flex-1 rounded-full border border-white/12 bg-white/[0.05] px-3.5 text-sm outline-none transition-all duration-300 placeholder:text-muted-foreground focus:border-gold/50 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_oklch(0.8_0.13_90/12%)]"
               />
               <button
                 type="submit"
                 disabled={busy}
                 aria-label="Send question"
-                className="flex size-9 items-center justify-center rounded-md border border-border text-muted-foreground hover:text-gold disabled:opacity-40"
+                className="flex size-9 items-center justify-center rounded-full border border-white/12 bg-white/[0.06] text-muted-foreground transition-all duration-300 hover:border-gold/55 hover:text-gold hover:shadow-[0_0_22px_-6px_oklch(0.8_0.13_90/70%)] disabled:opacity-40"
               >
                 <Send className="size-4" />
               </button>
@@ -281,14 +296,18 @@ export function DealDeskDock() {
         onPointerUp={stopRecording}
         onPointerLeave={stopRecording}
         aria-label="Hold to ask the AuditDesk"
-        className={`group flex items-center gap-2.5 rounded-full border py-2 pl-2 pr-4 shadow-2xl backdrop-blur transition ${
+        className={`group relative flex items-center gap-2.5 overflow-hidden rounded-full border py-2 pl-2 pr-4 backdrop-blur-2xl transition-all duration-500 active:scale-[0.98] ${
           phase === "recording"
-            ? "border-crimson/60 bg-crimson/15"
-            : "border-hairline-strong bg-popover/90 hover:border-azure/60"
+            ? "border-crimson/60 bg-crimson/15 shadow-[0_0_44px_-10px_oklch(0.65_0.22_16/70%)]"
+            : "border-white/12 bg-[oklch(0.2_0.026_264/72%)] shadow-[0_18px_44px_-22px_oklch(0_0_0/95%)] hover:border-gold/50 hover:shadow-[0_0_46px_-12px_oklch(0.8_0.13_90/55%)]"
         }`}
       >
         <span
-          className={`flex size-9 items-center justify-center rounded-full ${phase === "recording" ? "bg-crimson text-destructive-foreground" : "bg-azure/15 text-azure"}`}
+          className={`flex size-9 items-center justify-center rounded-full transition-all duration-500 ${
+            phase === "recording"
+              ? "bg-crimson text-destructive-foreground"
+              : "bg-gradient-to-br from-azure/25 to-azure/5 text-azure shadow-[inset_0_1px_0_0_oklch(1_0_0/12%)]"
+          }`}
         >
           {phase === "recording" ? (
             <Square className="size-3.5" />

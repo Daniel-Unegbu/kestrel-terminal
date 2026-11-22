@@ -89,14 +89,14 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
   const showTranscript = state !== "idle" || progress > 0;
 
   return (
-    <div className="panel overflow-hidden">
+    <div className="panel top-hairline overflow-hidden">
       <div className="flex items-center gap-3 p-3">
         <button
           onClick={start}
           aria-label={
             state === "playing" ? "Pause audio brief" : "Play 60-second Lead Auditor brief"
           }
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gold-gradient text-gold-foreground shadow-gold transition hover:brightness-110"
+          className="sheen flex size-10 shrink-0 items-center justify-center rounded-full bg-gold-gradient text-gold-foreground shadow-gold transition-all duration-300 hover:-translate-y-px hover:brightness-110 hover:shadow-[0_0_38px_-8px_oklch(0.8_0.13_90/75%)]"
         >
           {state === "loading" ? (
             <Loader2 className="size-4 animate-spin" />
@@ -116,15 +116,15 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
           {Array.from({ length: 22 }).map((_, i) => (
             <span
               key={i}
-              className={`w-[3px] rounded-full ${state === "playing" ? "bg-gold animate-wave" : "bg-hairline-strong"}`}
+              className={`w-[3px] rounded-full transition-colors ${state === "playing" ? "bg-gold shadow-[0_0_10px_oklch(0.8_0.13_90/80%)] animate-wave" : "bg-white/15"}`}
               style={{ height: `${30 + ((i * 37) % 70)}%`, animationDelay: `${(i % 7) * 0.09}s` }}
             />
           ))}
         </div>
       </div>
-      <div className="h-px bg-border">
+      <div className="h-px bg-white/[0.07]">
         <div
-          className="h-px bg-gold transition-[width] duration-200"
+          className="h-px bg-gradient-to-r from-gold/60 via-gold to-gold/60 shadow-[0_0_10px_oklch(0.8_0.13_90/80%)] transition-[width] duration-200"
           style={{ width: `${progress * 100}%` }}
         />
       </div>
