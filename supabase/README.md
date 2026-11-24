@@ -7,7 +7,7 @@ no Drizzle, no external AI gateway).
 | ----------------------------- | --------------------------------------------------------------------------------------- |
 | `migrations/`                 | Postgres schema, indexes, grants, RLS                                                   |
 | `functions/research-entity/`  | Tavily deep research + direct Gemini JSON synthesis, cached in `institutional_dossiers` |
-| `functions/voice-brief/`      | Deepgram Aura TTS only — returns raw `audio/mpeg`                                       |
+| `functions/voice-brief/`      | Deepgram Aura TTS only — returns raw `audio/mpeg`; optionally accepts `voice: "female"` |
 | `functions/dealdesk-qa/`      | Deepgram Nova STT + SerpAPI Google search — **no Gemini**                               |
 | `functions/pilot-simulation/` | Snapshots for the IS Audit Capacity & Risk-Mitigation Simulator                         |
 | `functions/_shared/`          | CORS, publishable-key gate, admin client, provider adapters, schema, ROI model          |
@@ -114,6 +114,12 @@ curl -s -o brief.mp3 -w '%{http_code} %{content_type} %{size_download}\n' \
   -X POST "$BASE/voice-brief" -H "apikey: $KEY" \
   -H "content-type: application/json" \
   -d '{"script":"Good morning. Three control priorities stand out."}'
+
+# AuditDesk female voice — same endpoint and response format
+curl -s -o auditdesk.mp3 -w '%{http_code} %{content_type} %{size_download}\n' \
+  -X POST "$BASE/voice-brief" -H "apikey: $KEY" \
+  -H "content-type: application/json" \
+  -d '{"script":"Review access controls first.","voice":"female"}'
 
 # Search Agent — SerpAPI only, no LLM
 curl -s -X POST "$BASE/dealdesk-qa" -H "apikey: $KEY" \

@@ -141,7 +141,11 @@ export function DossierView({
             Updated {new Date(d.lastUpdatedIso).toUTCString().replace(" GMT", " UTC")}
           </div>
         </div>
-        <AudioBrief script={d.executiveBriefAudioScript} cacheKey={cacheKey} />
+        <AudioBrief
+          script={d.executiveBriefAudioScript}
+          cacheKey={cacheKey}
+          isPreset={Boolean(d.isPreset)}
+        />
       </motion.div>
 
       <div className="grid gap-4 lg:grid-cols-12">

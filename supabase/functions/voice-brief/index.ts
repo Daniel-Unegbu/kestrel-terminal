@@ -7,6 +7,7 @@ import { errorMessage, json } from "../_shared/http.ts";
 const inputSchema = z.object({
   script: z.string().trim().min(1).max(4000).optional(),
   text: z.string().trim().min(1).max(4000).optional(),
+  voice: z.enum(["female", "lead"]).optional().default("lead"),
 });
 
 /**
@@ -34,7 +35,7 @@ Deno.serve(async (req) => {
     const script = parsed.data.script ?? parsed.data.text;
     if (!script) return json({ ok: false, error: "Invalid input" }, 400, cors);
 
-    const audio = await speak(script);
+    const audio = await speak(script, parsed.data.voice);
 
     return new Response(audio, {
       status: 200,

@@ -35,12 +35,10 @@ async function blobToBase64(blob: Blob): Promise<string> {
   return btoa(binary);
 }
 
-function firstSentences(text: string, limit = 320): string {
+export function firstSentence(text: string): string {
   const trimmed = text.trim();
-  if (trimmed.length <= limit) return trimmed;
-  const slice = trimmed.slice(0, limit);
-  const cut = Math.max(slice.lastIndexOf(". "), slice.lastIndexOf("! "), slice.lastIndexOf("? "));
-  return cut > 80 ? slice.slice(0, cut + 1) : `${slice.trimEnd()}…`;
+  const match = trimmed.match(/^[\s\S]*?[.!?](?:["')\]]*)(?=\s|$)/);
+  return match?.[0] ?? trimmed;
 }
 
 /**
@@ -50,10 +48,13 @@ function firstSentences(text: string, limit = 320): string {
 export const synthesizeSpeech = async ({
   data,
 }: {
-  data: { text: string };
+  data: { text: string; voice?: "female" | "lead" };
 }): Promise<TtsResult> => {
   try {
-    const { blob, mime } = await invokeEdgeAudio("voice-brief", { script: data.text });
+    const { blob, mime } = await invokeEdgeAudio("voice-brief", {
+      script: data.text,
+      ...(data.voice ? { voice: data.voice } : {}),
+    });
     return { ok: true, audioBase64: await blobToBase64(blob), mime };
   } catch (error) {
     console.error("Text-to-speech failed", error);
@@ -127,8 +128,8 @@ export const askDealDesk = async ({
 
     return {
       ok: true,
-      answer: res.answerText,
-      spoken: res.spokenText ?? firstSentences(res.answerText),
+      answer: firstSentence(res.answerText),
+      spoken: firstSentence(res.spokenText ?? res.answerText),
       leadPillar:
         res.leadPillar ?? dossier.eisaaPillarRouting?.[0]?.pillar ?? "Pre-Development System Audit",
       sourceRefs,

@@ -42,7 +42,7 @@ export function DealDeskDock() {
   const speak = useCallback(
     async (text: string) => {
       setPhase("speaking");
-      const res = await tts({ data: { text } }).catch(() => null);
+      const res = await tts({ data: { text, voice: "female" } }).catch(() => null);
       if (res?.ok) {
         const a = new Audio(`data:${res.mime};base64,${res.audioBase64}`);
         audio.current = a;
@@ -56,6 +56,14 @@ export function DealDeskDock() {
       }
       if (window.speechSynthesis) {
         const u = new SpeechSynthesisUtterance(text);
+        const voice = window.speechSynthesis
+          .getVoices()
+          .find(
+            (candidate) =>
+              /en-(GB|US)/.test(candidate.lang) &&
+              /female|woman|zira|samantha|aria|jenny|susan|victoria/i.test(candidate.name),
+          );
+        if (voice) u.voice = voice;
         u.onend = () => setPhase("idle");
         window.speechSynthesis.speak(u);
       } else setPhase("idle");

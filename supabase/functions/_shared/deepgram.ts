@@ -9,18 +9,19 @@ function apiKey(): string {
   return key;
 }
 
-function ttsModels(): string[] {
+function ttsModels(voice: "female" | "lead"): string[] {
+  if (voice === "female") return ["aura-2-asteria-en", "aura-asteria-en"];
   const configured = Deno.env.get("DEEPGRAM_TTS_MODEL")?.trim();
   // Aura-2 and Aura-1 use different model ids for the same voice.
   return [...new Set([configured, "aura-2-orion-en", "aura-orion-en"].filter(Boolean))] as string[];
 }
 
 /** Deepgram Aura text-to-speech. Returns the raw MP3 bytes. */
-export async function speak(text: string): Promise<Uint8Array> {
+export async function speak(text: string, voice: "female" | "lead" = "lead"): Promise<Uint8Array> {
   const key = apiKey();
   let lastStatus = 0;
 
-  for (const model of ttsModels()) {
+  for (const model of ttsModels(voice)) {
     const response = await fetchWithTimeout(
       `${DEEPGRAM_SPEAK}?model=${encodeURIComponent(model)}&encoding=mp3`,
       {

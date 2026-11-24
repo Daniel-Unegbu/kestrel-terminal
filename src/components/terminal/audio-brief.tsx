@@ -5,11 +5,20 @@ import { synthesizeSpeech } from "@/lib/voice.functions";
 
 const audioCache = new Map<string, string>();
 
-export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: string }) {
+export function AudioBrief({
+  script,
+  cacheKey,
+  isPreset,
+}: {
+  script: string;
+  cacheKey: string;
+  isPreset: boolean;
+}) {
   const tts = useServerFn(synthesizeSpeech);
   const [state, setState] = useState<"idle" | "loading" | "playing" | "paused">("idle");
   const [progress, setProgress] = useState(0);
-  const [engine, setEngine] = useState<"neural" | "browser" | null>(null);
+  const [engine, setEngine] = useState<"preset" | "neural" | "browser" | null>(null);
+  const [playbackError, setPlaybackError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const words = useMemo(() => script.split(/\s+/).filter(Boolean), [script]);
 
@@ -26,6 +35,7 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
     if (typeof window !== "undefined") window.speechSynthesis?.cancel();
     setState("idle");
     setProgress(0);
+    setPlaybackError(null);
   }, [cacheKey]);
 
   const playBrowser = () => {
@@ -50,22 +60,30 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
 
   const start = async () => {
     if (state === "playing") {
-      if (engine === "neural") audioRef.current?.pause();
+      if (engine !== "browser") audioRef.current?.pause();
       else window.speechSynthesis.pause();
       return setState("paused");
     }
     if (state === "paused") {
-      if (engine === "neural") await audioRef.current?.play();
+      if (engine !== "browser") await audioRef.current?.play();
       else window.speechSynthesis.resume();
       return setState("playing");
     }
     setState("loading");
-    let src = audioCache.get(cacheKey);
-    if (!src) {
-      const res = await tts({ data: { text: script } }).catch(() => null);
-      if (res?.ok) {
-        src = `data:${res.mime};base64,${res.audioBase64}`;
-        audioCache.set(cacheKey, src);
+    setPlaybackError(null);
+
+    let src: string | undefined;
+    if (isPreset) {
+      src = "/audio/lead-auditor-brief.mp3";
+      setEngine("preset");
+    } else {
+      src = audioCache.get(cacheKey);
+      if (!src) {
+        const res = await tts({ data: { text: script } }).catch(() => null);
+        if (res?.ok) {
+          src = `data:${res.mime};base64,${res.audioBase64}`;
+          audioCache.set(cacheKey, src);
+        }
       }
     }
     if (!src) return playBrowser();
@@ -76,12 +94,17 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
       setState("idle");
       setProgress(1);
     };
-    setEngine("neural");
+    if (!isPreset) setEngine("neural");
     try {
       await audio.play();
       setState("playing");
     } catch {
-      playBrowser();
+      if (isPreset) {
+        setPlaybackError("Couldn't play the preset audio brief.");
+        setState("idle");
+      } else {
+        playBrowser();
+      }
     }
   };
 
@@ -109,7 +132,11 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
         <div className="min-w-0 flex-1">
           <div className="text-sm font-medium">Play 60s Lead Auditor Brief</div>
           <div className="eyebrow !text-[10px] mt-0.5">
-            {engine === "browser" ? "Browser voice fallback" : "Voice Agent · lead auditor voice"}
+            {engine === "preset"
+              ? "Preset MP3 · Lead Auditor brief"
+              : engine === "browser"
+                ? "Browser voice fallback"
+                : "Voice Agent · lead auditor voice"}
           </div>
         </div>
         <div className="flex h-8 items-center gap-[3px]" aria-hidden="true">
@@ -128,6 +155,7 @@ export function AudioBrief({ script, cacheKey }: { script: string; cacheKey: str
           style={{ width: `${progress * 100}%` }}
         />
       </div>
+      {playbackError && <p className="px-3 py-2 text-xs text-crimson">{playbackError}</p>}
       {showTranscript && (
         <p className="max-h-36 overflow-y-auto p-3 text-[13px] leading-relaxed text-muted-foreground">
           {words.map((w, i) => (
