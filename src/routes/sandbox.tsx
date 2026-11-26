@@ -28,12 +28,12 @@ export const Route = createFileRoute("/sandbox")({
       {
         name: "description",
         content:
-          "Generate cited IS audit dossiers for Ethiopian public sector systems, financial core platforms, telecom and cloud services, and enterprise ERP — with control gaps, remediation roadmaps and EISAA pillar routing.",
+          "Generate cited IS audit dossiers for UAE public sector systems, financial core platforms, telecom and cloud services, and enterprise ERP — with control gaps, remediation roadmaps and UAE IAA pillar routing.",
       },
       { property: "og:title", content: "IS Audit & Governance Sandbox — Kestrel Terminal" },
       {
         property: "og:description",
-        content: "Cited audit dossiers in seconds, routed to the EISAA pillar that should lead.",
+        content: "Cited audit dossiers in seconds, routed to the UAE IAA pillar that should lead.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -160,7 +160,7 @@ function Sandbox() {
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Live system search — e.g. National Digital ID, Ethio Telecom, Addis interbank switch, Customs ERP"
+            placeholder="Live system search — e.g. UAE Pass, e&, Dubai interbank switch, Federal Customs Authority"
             className="h-10 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             maxLength={120}
           />

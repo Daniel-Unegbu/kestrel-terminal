@@ -3,7 +3,7 @@
  *
  * The AuditDesk path is SerpAPI-only, so a web snippet is the only thing it can
  * quote. That cannot answer questions about *this* system's audit file ("which
- * EISAA pillar should lead?") and Google has no answer box for them either. When
+ * UAE IAA pillar should lead?") and Google has no answer box for them either. When
  * a question asks for analysis the dossier already holds, the answer is
  * assembled from those researched facts verbatim; SerpAPI is not called at all,
  * and the citations come from the dossier.
@@ -26,7 +26,7 @@ export interface DossierPillarRoute {
   pillar?: string;
   recommendedService?: string;
   triggerSignal?: string;
-  estimatedRiskExposureETB?: string;
+  estimatedRiskExposureAED?: string;
   confidenceScore?: number;
 }
 
@@ -145,8 +145,8 @@ function pillarParagraph(dossier: DealDeskDossier): string | null {
   const details: string[] = [];
   if (lead.recommendedService) details.push(lead.recommendedService.toLowerCase());
   if (lead.triggerSignal) details.push(`triggered by ${lead.triggerSignal}`);
-  if (lead.estimatedRiskExposureETB) {
-    details.push(`risk exposure of about ${lead.estimatedRiskExposureETB}`);
+  if (lead.estimatedRiskExposureAED) {
+    details.push(`risk exposure of about ${lead.estimatedRiskExposureAED}`);
   }
   if (typeof lead.confidenceScore === "number") {
     details.push(`${lead.confidenceScore}% confidence`);

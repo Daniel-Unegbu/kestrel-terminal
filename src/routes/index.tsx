@@ -18,7 +18,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Governance telemetry and the IS audit bottleneck across Ethiopia's public and private sectors, with the live research pipeline that resolves it.",
+          "Governance telemetry and the IS audit bottleneck across UAE's public and private sectors, with the live research pipeline that resolves it.",
       },
       { property: "og:title", content: "Command Center — Kestrel Terminal" },
       {
@@ -34,10 +34,10 @@ export const Route = createFileRoute("/")({
 });
 
 const KPIS = [
-  { label: "Association charter", value: "Proclamation 1113/2019", sub: "registered October 2021" },
+  { label: "Association charter", value: "Federal Decree-Law No. 35 of 2021", sub: "registered October 2021" },
   { label: "Audit scope", value: "Pre & post-development", sub: "information system audits" },
-  { label: "Core frameworks", value: "ISO 20000 · COBIT", sub: "INSA cyber standards" },
-  { label: "Ecosystem partners", value: "INSA · ECySA", sub: "NetHost UK · Scratch & Script" },
+  { label: "Core frameworks", value: "ISO 20000 · COBIT", sub: "TDRA cyber standards" },
+  { label: "Ecosystem partners", value: "TDRA · UAE Cybersecurity Council", sub: "Khazna · Emirates NBD · e&" },
   { label: "Primary mandate", value: "ICT protection", sub: "fraud prevention & governance" },
 ];
 
@@ -48,7 +48,7 @@ const NODES = [
     ring: "border-azure/40",
     eyebrow: "01 · Ingestion",
     title: "Live multi-source retrieval",
-    body: "INSA directives, proclamations, vulnerability advisories and audit guidance, with an independent search fallback for niche systems.",
+    body: "TDRA directives, proclamations, vulnerability advisories and audit guidance, with an independent search fallback for niche systems.",
   },
   {
     icon: Sparkles,
@@ -72,7 +72,7 @@ const PILLARS = [
   { n: "P1", t: "Strategic problem fit", to: "/", d: "Command Center" },
   { n: "P2", t: "Product depth", to: "/sandbox", d: "Audit Sandbox" },
   { n: "P3", t: "Technical architecture", to: "/architecture", d: "Sovereign blueprint" },
-  { n: "P4", t: "Security & compliance", to: "/architecture", d: "INSA / Proclamation matrix" },
+  { n: "P4", t: "Security & compliance", to: "/architecture", d: "TDRA / Federal law matrix" },
   { n: "P5", t: "Capacity & risk impact", to: "/roi-model", d: "Audit impact simulator" },
 ] as const;
 
@@ -99,8 +99,8 @@ function CommandCenter() {
             already mapped.
           </h1>
           <p className="mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">
-            Kestrel turns live governance intelligence into cited audit dossiers for EISAA members —
-            routed to the right EISAA pillar, and briefed aloud in sixty seconds.
+            Kestrel turns live governance intelligence into cited audit dossiers for UAE IAA members —
+            routed to the right UAE IAA pillar, and briefed aloud in sixty seconds.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Button asChild variant="gold" size="lg">
@@ -148,7 +148,7 @@ function CommandCenter() {
             systems.
           </h2>
           <p className="mt-4 max-w-3xl text-muted-foreground">
-            Across Ethiopia's public and private sectors, IS auditors and IT governance teams stitch
+            Across UAE's public and private sectors, IS auditors and IT governance teams stitch
             together system documentation, regulatory directives, prior audit findings and
             vulnerability advisories by hand before every pre- or post-development review. The
             result: slower assurance, inconsistent control framing, and fraud or continuity risks

@@ -50,7 +50,7 @@ export const generatedDossierSchema = z.object({
       evidenceCollectionDays: num(),
       logRetentionDays: num(),
       findingClosureDays: num(),
-      openRiskExposureETBMillions: num(),
+      openRiskExposureAEDMillions: num(),
       auditToolingMaturity: z.string().catch("Undisclosed"),
       sourceRefs: refs,
     })
@@ -58,7 +58,7 @@ export const generatedDossierSchema = z.object({
       evidenceCollectionDays: 0,
       logRetentionDays: 0,
       findingClosureDays: 0,
-      openRiskExposureETBMillions: 0,
+      openRiskExposureAEDMillions: 0,
       auditToolingMaturity: "Undisclosed",
     }),
   remediationRoadmap: z
@@ -94,7 +94,7 @@ export const generatedDossierSchema = z.object({
           .catch("Pre-Development System Audit"),
         recommendedService: z.string(),
         triggerSignal: z.string().catch(""),
-        estimatedRiskExposureETB: z.string().catch("—"),
+        estimatedRiskExposureAED: z.string().catch("—"),
         confidenceScore: num(50),
         sourceRefs: refs,
       }),
@@ -105,12 +105,12 @@ export const generatedDossierSchema = z.object({
       z.object({
         category: z
           .enum([
-            "INSA / National Cyber Policy",
-            "Proclamation 1113/2019 & Governance",
+            "TDRA / National Cyber Policy",
+            "Federal Decree-Law No. 35 of 2021 & Governance",
             "Fraud & Internal Control Risk",
             "ISO 20000 / Service Continuity",
           ])
-          .catch("INSA / National Cyber Policy"),
+          .catch("TDRA / National Cyber Policy"),
         severity: z.enum(["INFO", "WATCH", "CRITICAL"]).catch("INFO"),
         finding: z.string(),
         sourceIndex: z.coerce.number().int().optional().catch(undefined),

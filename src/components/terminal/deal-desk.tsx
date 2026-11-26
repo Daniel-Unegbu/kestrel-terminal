@@ -9,7 +9,7 @@ import { useTerminal } from "./terminal-context";
 type Phase = "idle" | "recording" | "transcribing" | "thinking" | "speaking";
 
 const SUGGESTED =
-  "What are the top two control gaps and fraud risks for this system, and which EISAA pillar should lead?";
+  "What are the top two control gaps and fraud risks for this system, and which UAE IAA pillar should lead?";
 
 function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {

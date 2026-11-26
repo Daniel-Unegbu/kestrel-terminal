@@ -8,7 +8,7 @@ import { adminClient } from "../_shared/supabase.ts";
 const inputSchema = z.object({
   auditorCount: z.number().int().min(1).max(5000),
   weeklyHoursSaved: z.number().min(0).max(40),
-  avgLossPreventedETB: z.number().min(0).max(100_000_000),
+  avgLossPreventedAED: z.number().min(0).max(100_000_000),
   detectionLiftPct: z.number().min(0).max(50),
 });
 
@@ -34,17 +34,17 @@ Deno.serve(async (req) => {
     // The table keeps its original column names so the deployed schema does not
     // need a migration. Each column now stores the IS audit equivalent:
     //   rm_count                    → active IS auditors
-    //   avg_mandate_fee_aed         → average loss prevented per audit (ETB)
+    //   avg_mandate_fee_aed         → average loss prevented per audit (AED)
     //   win_rate_lift_pct           → control-gap detection lift (%)
-    //   projected_incremental_fee_aed → projected loss prevented (ETB)
+    //   projected_incremental_fee_aed → projected loss prevented (AED)
     const { data: row, error } = await adminClient()
       .from("pilot_simulations")
       .insert({
         rm_count: input.auditorCount,
         weekly_hours_saved: input.weeklyHoursSaved,
-        avg_mandate_fee_aed: input.avgLossPreventedETB,
+        avg_mandate_fee_aed: input.avgLossPreventedAED,
         win_rate_lift_pct: input.detectionLiftPct,
-        projected_incremental_fee_aed: Math.round(output.lossPreventedETB),
+        projected_incremental_fee_aed: Math.round(output.lossPreventedAED),
       })
       .select("id, created_at")
       .single();

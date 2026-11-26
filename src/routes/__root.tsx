@@ -90,7 +90,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "IS audit, IT governance and cyber risk intelligence terminal for EISAA members: cited system dossiers, Lead Auditor briefs and control-gap modelling.",
+          "IS audit, IT governance and cyber risk intelligence terminal for UAE IAA members: cited system dossiers, Lead Auditor briefs and control-gap modelling.",
       },
       { name: "author", content: "Kestrel Terminal" },
       {
@@ -100,7 +100,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "Cited audit dossiers, Lead Auditor voice briefs and control-gap modelling for Ethiopian public and private sector IS audit teams.",
+          "Cited audit dossiers, Lead Auditor voice briefs and control-gap modelling for UAE public and private sector IS audit teams.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

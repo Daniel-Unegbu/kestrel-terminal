@@ -89,7 +89,7 @@ export const transcribeAudio = async ({
 /**
  * dealdesk-qa: dossier answers for audit-file questions, SerpAPI Google search
  * for everything else (no Gemini). The edge function returns a single answer
- * plus the lead EISAA pillar and source URLs; those map onto the UI's shape.
+ * plus the lead UAE IAA pillar and source URLs; those map onto the UI's shape.
  */
 export const askDealDesk = async ({
   data,

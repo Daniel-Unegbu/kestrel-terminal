@@ -19,7 +19,7 @@ import { Slider } from "@/components/ui/slider";
 import { savePilotSimulation } from "@/lib/pilot.functions";
 import {
   computeRoi,
-  formatETBCompact,
+  formatAEDCompact,
   ROI_ASSUMPTIONS,
   ROI_DEFAULTS,
   sensitivityCurve,
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/roi-model")({
       {
         name: "description",
         content:
-          "Model audit hours reclaimed, ICT loss and downtime prevented, and 90-day pilot break-even for EISAA member organisations.",
+          "Model audit hours reclaimed, ICT loss and downtime prevented, and 90-day pilot break-even for UAE IAA member organisations.",
       },
       {
         property: "og:title",
@@ -75,12 +75,12 @@ const SLIDERS: Array<{
     fmt: (v) => `${v.toFixed(1)} hrs`,
   },
   {
-    key: "avgLossPreventedETB",
+    key: "avgLossPreventedAED",
     label: "Avg. ICT fraud / downtime loss prevented per pre-deployment audit",
     min: 250_000,
     max: 20_000_000,
     step: 250_000,
-    fmt: (v) => formatETBCompact(v),
+    fmt: (v) => formatAEDCompact(v),
   },
   {
     key: "detectionLiftPct",
@@ -126,7 +126,7 @@ function RoiModel() {
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
             ICT fraud, failed controls and unplanned downtime erode public trust and institutional
             budgets. Move the levers to see what faster, better-evidenced IS audit coverage is worth
-            for EISAA member organisations.
+            for UAE IAA member organisations.
           </p>
         </div>
         <div className="flex gap-2">
@@ -134,7 +134,7 @@ function RoiModel() {
             <RotateCcw /> Reset
           </Button>
           <Button variant="gold" onClick={openSheet}>
-            <FileText /> Export 90-Day EISAA Pilot Charter
+            <FileText /> Export 90-Day UAE IAA Pilot Charter
           </Button>
         </div>
       </div>
@@ -165,13 +165,13 @@ function RoiModel() {
               <dd className="num text-right">{ROI_ASSUMPTIONS.workingWeeksPerYear}</dd>
               <dt className="text-muted-foreground">Loaded auditor cost / hr</dt>
               <dd className="num text-right">
-                ETB {ROI_ASSUMPTIONS.loadedCostPerHourETB.toLocaleString()}
+                AED {ROI_ASSUMPTIONS.loadedCostPerHourAED.toLocaleString()}
               </dd>
               <dt className="text-muted-foreground">Baseline audits / auditor / yr</dt>
               <dd className="num text-right">{ROI_ASSUMPTIONS.baselineAuditsPerAuditorPerYear}</dd>
               <dt className="text-muted-foreground">Annual platform cost</dt>
               <dd className="num text-right">
-                {formatETBCompact(ROI_ASSUMPTIONS.annualPlatformCostETB)}
+                {formatAEDCompact(ROI_ASSUMPTIONS.annualPlatformCostAED)}
               </dd>
             </dl>
           </div>
@@ -182,11 +182,11 @@ function RoiModel() {
             <OutputCard
               eyebrow="Audit capacity reclaimed"
               value={`${Math.round(out.annualHoursReclaimed).toLocaleString()} hrs`}
-              sub={`${formatETBCompact(out.operationalEfficiencyETB)} operating cost efficiency / yr`}
+              sub={`${formatAEDCompact(out.operationalEfficiencyAED)} operating cost efficiency / yr`}
             />
             <OutputCard
               eyebrow="ICT loss & downtime prevented"
-              value={formatETBCompact(out.lossPreventedETB)}
+              value={formatAEDCompact(out.lossPreventedAED)}
               sub={`${out.incrementalDetectionsPerYear.toFixed(0)} control gaps caught / yr`}
               gold
             />
@@ -204,7 +204,7 @@ function RoiModel() {
                   Loss-prevented sensitivity to detection lift
                 </h3>
                 <div className="mt-0.5 text-xs text-muted-foreground">
-                  ETB millions per year · current point highlighted
+                  AED millions per year · current point highlighted
                 </div>
               </div>
               <div className="num text-right text-xs text-muted-foreground">
@@ -247,7 +247,7 @@ function RoiModel() {
                       fontFamily: "var(--font-mono)",
                       fontSize: 12,
                     }}
-                    formatter={(v: number) => [`ETB ${v.toFixed(1)}M`, "Loss prevented"]}
+                    formatter={(v: number) => [`AED ${v.toFixed(1)}M`, "Loss prevented"]}
                     labelFormatter={(l) => `Lift ${l}%`}
                   />
                   <Line
@@ -260,7 +260,7 @@ function RoiModel() {
                   />
                   <ReferenceDot
                     x={inputs.detectionLiftPct}
-                    y={out.lossPreventedETB / 1e6}
+                    y={out.lossPreventedAED / 1e6}
                     r={5}
                     fill="var(--color-gold)"
                     stroke="var(--color-background)"
@@ -276,14 +276,14 @@ function RoiModel() {
       <Dialog open={sheetOpen} onOpenChange={setSheetOpen}>
         <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>90-Day EISAA Member Pilot & Capacity-Building Charter</DialogTitle>
+            <DialogTitle>90-Day UAE IAA Member Pilot & Capacity-Building Charter</DialogTitle>
           </DialogHeader>
           <div id="term-sheet" className="space-y-4 text-sm">
             <div className="flex items-start justify-between border-b border-border pb-3">
               <div>
-                <div className="font-semibold">Kestrel Terminal × EISAA Member Institutions</div>
+                <div className="font-semibold">Kestrel Terminal × UAE IAA Member Institutions</div>
                 <div className="text-xs text-muted-foreground">
-                  Prepared for EISAA technical committee review
+                  Prepared for UAE IAA technical committee review
                 </div>
               </div>
               <div className="num text-right text-[11px] text-muted-foreground">
@@ -307,7 +307,7 @@ function RoiModel() {
             <Section title="Scope">
               Proof-of-value for {Math.min(30, inputs.auditorCount)} IS auditors over{" "}
               {ROI_ASSUMPTIONS.pilotDays} days, deployed inside a sovereign or on-premise cloud
-              boundary with INSA-aligned controls and a full audit trail for pre- and
+              boundary with TDRA-aligned controls and a full audit trail for pre- and
               post-development reviews.
             </Section>
             <table className="w-full text-sm">
@@ -320,17 +320,17 @@ function RoiModel() {
                   ],
                   [
                     "Avg. ICT loss / downtime prevented per pre-deployment audit",
-                    formatETBCompact(inputs.avgLossPreventedETB),
+                    formatAEDCompact(inputs.avgLossPreventedAED),
                   ],
                   ["Control-gap detection lift", `${inputs.detectionLiftPct.toFixed(1)}%`],
                   [
                     "Annual audit capacity reclaimed",
                     `${Math.round(out.annualHoursReclaimed).toLocaleString()} hrs`,
                   ],
-                  ["Projected loss prevented / yr", formatETBCompact(out.lossPreventedETB)],
+                  ["Projected loss prevented / yr", formatAEDCompact(out.lossPreventedAED)],
                   [
                     "Projected loss prevented in pilot window",
-                    formatETBCompact(out.pilotLossPreventedETB),
+                    formatAEDCompact(out.pilotLossPreventedAED),
                   ],
                   ["Break-even", `${out.breakEvenAudits} pre-deployment audits`],
                 ].map(([k, v]) => (
@@ -342,7 +342,7 @@ function RoiModel() {
               </tbody>
             </table>
             <Section title="Milestones">
-              Weeks 1–2: sandbox setup with the EISAA technical committee · Weeks 3–6: pilot cohort
+              Weeks 1–2: sandbox setup with the UAE IAA technical committee · Weeks 3–6: pilot cohort
               of 30 IS auditors & training integration · Weeks 7–12: audit hours saved &
               pre-development risk report.
             </Section>
@@ -353,7 +353,7 @@ function RoiModel() {
             </Section>
             <Section title="Governance">
               National data sovereignty, no external model training, role-based access control, a
-              single ephemeral session token and immutable audit logs for the EISAA technical
+              single ephemeral session token and immutable audit logs for the UAE IAA technical
               committee.
             </Section>
           </div>

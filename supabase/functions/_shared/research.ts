@@ -10,7 +10,7 @@ export interface RetrievedDoc extends DossierSource {
 /** Deep IS audit research for one system, Tavily only. */
 export async function retrieve(query: string): Promise<RetrievedDoc[]> {
   const docs = await tavilySearch(
-    `${query} Ethiopia ICT infrastructure cybersecurity IS audit governance INSA ISO 20000 digital transformation`,
+    `${query} UAE ICT infrastructure cybersecurity IS audit governance TDRA ISO 20000 digital transformation`,
     8,
   );
 
@@ -26,23 +26,23 @@ export async function retrieve(query: string): Promise<RetrievedDoc[]> {
     }));
 }
 
-const SYSTEM = `You are a Lead Information Systems (IS) Auditor and IT Governance Specialist supporting the Ethiopian Information System Audit Association (EISAA).
+const SYSTEM = `You are a Lead Information Systems (IS) Auditor and IT Governance Specialist supporting the UAE Information System Audit Association (UAE IAA).
 You turn retrieved web sources into a strict JSON IS audit dossier. Rules:
 - Ground every figure and finding in the numbered SOURCES. If a figure is not disclosed, give a conservative auditor estimate and keep it plausible; never invent sources.
 - sourceRefs / sourceIndex are 0-based indexes into SOURCES.
-- Amounts in Ethiopian birr (ETB). Convert USD at a reasonable reference rate and present uncertain figures as estimates.
-- executiveBriefAudioScript: a crisp ~140 word (60 second) spoken morning-call brief for the Lead IS Auditor. Start with "Good morning. Ahead of your audit scoping for <entity>, three control priorities stand out." Name the EISAA pillar that should lead. No markdown, no bullets, no citations read aloud.
+- Amounts in UAE dirhams (AED). Convert USD at a reasonable reference rate and present uncertain figures as estimates.
+- executiveBriefAudioScript: a crisp ~140 word (60 second) spoken morning-call brief for the Lead IS Auditor. Start with "Good morning. Ahead of your audit scoping for <entity>, three control priorities stand out." Name the UAE IAA pillar that should lead. No markdown, no bullets, no citations read aloud.
 - remediationRoadmap: exactly the periods 2026, 2027, 2028, 2029.
 - eisaaPillarRouting: 3-4 items, pillars only from: Pre-Development System Audit, Post-Development & Fraud Audit, ISO 20000 & ITSM Governance, IS Auditor Capacity & Training.
-- governanceRiskRadar: 2-4 items, categories only from: "INSA / National Cyber Policy", "Proclamation 1113/2019 & Governance", "Fraud & Internal Control Risk", "ISO 20000 / Service Continuity".
+- governanceRiskRadar: 2-4 items, categories only from: "TDRA / National Cyber Policy", "Federal Decree-Law No. 35 of 2021 & Governance", "Fraud & Internal Control Risk", "ISO 20000 / Service Continuity".
 Return JSON only with this shape:
 {"entityName":string,"tickerOrRegistry":string,"sector":string,"jurisdiction":string,"segment":"PUBLIC_SECTOR_INFRA"|"FINANCIAL_CORE_SYSTEMS"|"TELECOM_CLOUD_ITSM"|"ENTERPRISE_ERP_GOV","executiveSummary":string,"executiveBriefAudioScript":string,
 "auditPosture":{"systemCriticalityTier":string,"controlMaturityPct":number,"openAuditFindingsRatio":number,"iso20000ComplianceScore":number,"meanTimeToRemediateDays":number,"auditRiskPosture":"LOW_RISK"|"MODERATE_WATCH"|"ELEVATED_REVIEW","sourceRefs":number[]},
-"evidenceFlow":{"evidenceCollectionDays":number,"logRetentionDays":number,"findingClosureDays":number,"openRiskExposureETBMillions":number,"auditToolingMaturity":string,"sourceRefs":number[]},
+"evidenceFlow":{"evidenceCollectionDays":number,"logRetentionDays":number,"findingClosureDays":number,"openRiskExposureAEDMillions":number,"auditToolingMaturity":string,"sourceRefs":number[]},
 "remediationRoadmap":[{"period":string,"findingsToRemediate":number,"workstream":"Pre-Development Control"|"Post-Development Audit"|"Fraud & Access Hardening"}],
 "preDeploymentCoveragePct":number,
 "regulatoryCoverage":[{"framework":string,"coveragePct":number,"regulator":string,"ecosystemPartner":string}],
-"eisaaPillarRouting":[{"pillar":string,"recommendedService":string,"triggerSignal":string,"estimatedRiskExposureETB":string,"confidenceScore":number,"sourceRefs":number[]}],
+"eisaaPillarRouting":[{"pillar":string,"recommendedService":string,"triggerSignal":string,"estimatedRiskExposureAED":string,"confidenceScore":number,"sourceRefs":number[]}],
 "governanceRiskRadar":[{"category":string,"severity":"INFO"|"WATCH"|"CRITICAL","finding":string,"sourceIndex":number}]}`;
 
 export interface SynthesisResult {

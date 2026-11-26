@@ -20,7 +20,7 @@ export const Route = createFileRoute("/architecture")({
       {
         name: "description",
         content:
-          "Two-container deployment behind a single governed orchestration core, with INSA-aligned controls, Proclamation 1113/2019 governance and a 90-day EISAA member pilot roadmap.",
+          "Two-container deployment behind a single governed orchestration core, with TDRA-aligned controls, Federal Decree-Law No. 35 of 2021 governance and a 90-day UAE IAA member pilot roadmap.",
       },
       {
         property: "og:title",
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/architecture")({
       {
         property: "og:description",
         content:
-          "National data sovereignty, INSA-aligned controls and an auditable trail for credit-committee-grade review.",
+          "National data sovereignty, TDRA-aligned controls and an auditable trail for credit-committee-grade review.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/architecture")({
 const PHASES = {
   mvp: {
     label: "Phase 1 · Rapid prototype",
-    note: "The application tier calls research and voice connectors directly while the orchestration core governs model inference only — the fastest path to a working EISAA pilot.",
+    note: "The application tier calls research and voice connectors directly while the orchestration core governs model inference only — the fastest path to a working UAE IAA pilot.",
     app: [
       "Internal Database · audit & dossier cache",
       "Institutional SSO · role-based access",
@@ -75,7 +75,7 @@ const CONTROLS = [
   {
     icon: Users,
     title: "Role-based access control",
-    tag: "Proclamation 1113/2019",
+    tag: "Federal Decree-Law No. 35 of 2021",
     body: "Auditor, reviewer and technical-committee roles scoped by sector and institution; institutional SSO.",
   },
   {
@@ -99,21 +99,21 @@ const CONTROLS = [
   {
     icon: Lock,
     title: "National data sovereignty",
-    tag: "INSA",
+    tag: "TDRA",
     body: "Workloads, logs and vector caches pinned to a sovereign or on-premise boundary; no external model training.",
   },
   {
     icon: FileLock2,
     title: "Fraud & access screening",
     tag: "Fraud control",
-    body: "Radar findings link to INSA, ECySA and regulator sources and route CRITICAL items for review.",
+    body: "Radar findings link to TDRA, UAE Cybersecurity Council and regulator sources and route CRITICAL items for review.",
   },
 ];
 
 const ROADMAP = [
   {
     weeks: "Weeks 1–2",
-    title: "Sandbox setup with the EISAA technical committee",
+    title: "Sandbox setup with the UAE IAA technical committee",
     body: "App and orchestration containers in a sovereign or on-premise boundary; SSO, logging and network policies.",
   },
   {
@@ -124,7 +124,7 @@ const ROADMAP = [
   {
     weeks: "Weeks 7–12",
     title: "Audit hours saved & pre-development risk report",
-    body: "Time-logged hours saved and attributable control gaps reviewed with the EISAA technical committee.",
+    body: "Time-logged hours saved and attributable control gaps reviewed with the UAE IAA technical committee.",
   },
 ];
 
@@ -169,7 +169,7 @@ function Architecture() {
                 Sovereign deployment boundary · sovereign / on-premise cloud · private tenant
               </span>
               <span className="ml-auto num text-[10px] text-muted-foreground">
-                INSA-aligned controls
+                TDRA-aligned controls
               </span>
             </div>
             <div className="mt-5 grid items-stretch gap-4 lg:grid-cols-[1fr_auto_1.2fr_auto_1fr]">
@@ -192,7 +192,7 @@ function Architecture() {
               <Node
                 icon={Cloud}
                 title="Sovereign / On-Premise Cloud Boundary"
-                sub="Zero external model training · full audit trail · ISO 20000 & INSA ready"
+                sub="Zero external model training · full audit trail · ISO 20000 & TDRA ready"
                 items={SOVEREIGN_NODE}
                 tone="emerald"
               />
@@ -211,7 +211,7 @@ function Architecture() {
 
       {/* Compliance matrix */}
       <section className="mt-10">
-        <h2 className="text-2xl font-semibold">INSA & Proclamation compliance matrix</h2>
+        <h2 className="text-2xl font-semibold">TDRA & federal compliance matrix</h2>
         <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {CONTROLS.map((c, i) => (
             <button
@@ -243,7 +243,7 @@ function Architecture() {
       {/* Roadmap */}
       <section className="mt-10">
         <h2 className="text-2xl font-semibold">
-          90-day EISAA capacity-building & member pilot roadmap
+          90-day UAE IAA capacity-building & member pilot roadmap
         </h2>
         <ol className="relative mt-6 grid gap-4 md:grid-cols-3">
           <div className="absolute left-0 right-0 top-[7px] hidden h-px bg-gradient-to-r from-gold via-azure to-emerald md:block" />

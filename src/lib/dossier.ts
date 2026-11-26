@@ -10,8 +10,8 @@ export type EisaaPillar =
   | "ISO 20000 & ITSM Governance"
   | "IS Auditor Capacity & Training";
 export type RadarCategory =
-  | "INSA / National Cyber Policy"
-  | "Proclamation 1113/2019 & Governance"
+  | "TDRA / National Cyber Policy"
+  | "Federal Decree-Law No. 35 of 2021 & Governance"
   | "Fraud & Internal Control Risk"
   | "ISO 20000 / Service Continuity";
 export type Severity = "INFO" | "WATCH" | "CRITICAL";
@@ -58,7 +58,7 @@ export interface InstitutionalDossier {
     evidenceCollectionDays: number;
     logRetentionDays: number;
     findingClosureDays: number;
-    openRiskExposureETBMillions: number;
+    openRiskExposureAEDMillions: number;
     auditToolingMaturity: string;
     sourceRefs?: number[] | undefined;
   };
@@ -78,7 +78,7 @@ export interface InstitutionalDossier {
     pillar: EisaaPillar;
     recommendedService: string;
     triggerSignal: string;
-    estimatedRiskExposureETB: string;
+    estimatedRiskExposureAED: string;
     confidenceScore: number;
     sourceRefs?: number[] | undefined;
   }>;

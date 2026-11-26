@@ -55,9 +55,9 @@ The IS audit inputs are mapped onto them in `functions/pilot-simulation/index.ts
 | ------------------------------- | ------------------------------------------- |
 | `rm_count`                      | active IS auditors                          |
 | `weekly_hours_saved`            | manual scoping hours saved / auditor / week |
-| `avg_mandate_fee_aed`           | average ICT loss prevented per audit (ETB)  |
+| `avg_mandate_fee_aed`           | average ICT loss prevented per audit (AED)  |
 | `win_rate_lift_pct`             | control-gap detection lift (%)              |
-| `projected_incremental_fee_aed` | projected loss prevented (ETB)              |
+| `projected_incremental_fee_aed` | projected loss prevented (AED)              |
 
 Never put any of these keys in Vercel or in the repo. The browser only ever holds
 the publishable key.
@@ -103,11 +103,11 @@ KEY=$SUPABASE_PUBLISHABLE_KEY
 # Research Agent — Tavily + Gemini (slow, ~10-25s)
 curl -s -X POST "$BASE/research-entity" -H "apikey: $KEY" \
   -H "content-type: application/json" \
-  -d '{"query":"Ethio Telecom","forceRefresh":false}'
+  -d '{"query":"e&","forceRefresh":false}'
 
 # Same call again must return {"ok":true,"cached":true,...}
 curl -s -X POST "$BASE/research-entity" -H "apikey: $KEY" \
-  -H "content-type: application/json" -d '{"query":"Ethio Telecom"}'
+  -H "content-type: application/json" -d '{"query":"e&"}'
 
 # Voice Agent — Deepgram Aura, expect audio/mpeg bytes
 curl -s -o brief.mp3 -w '%{http_code} %{content_type} %{size_download}\n' \
@@ -124,7 +124,7 @@ curl -s -o auditdesk.mp3 -w '%{http_code} %{content_type} %{size_download}\n' \
 # Search Agent — SerpAPI only, no LLM
 curl -s -X POST "$BASE/dealdesk-qa" -H "apikey: $KEY" \
   -H "content-type: application/json" \
-  -d '{"questionText":"latest INSA cyber directive","entityName":"Ethio Telecom"}'
+  -d '{"questionText":"latest TDRA cyber directive","entityName":"e&"}'
 ```
 
 A missing or wrong `apikey` must return `401 {"ok":false,"error":"Unauthorized"}`.

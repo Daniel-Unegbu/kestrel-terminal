@@ -39,7 +39,7 @@ export function CommandPalette() {
       <CommandInput placeholder="Search audit dossiers, views, actions…" />
       <CommandList>
         <CommandEmpty>No match.</CommandEmpty>
-        <CommandGroup heading="Ethiopian IS audit dossiers">
+        <CommandGroup heading="UAE IS audit dossiers">
           {PRESET_DOSSIERS.map((d) => (
             <CommandItem
               key={d.slug}

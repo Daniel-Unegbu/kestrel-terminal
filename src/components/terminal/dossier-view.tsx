@@ -276,7 +276,7 @@ export function DossierView({
             <Metric label="Evidence-to-closure" value={`${Math.round(evidenceCycleDays)}d`} />
             <Metric
               label="Open risk exposure"
-              value={`ETB ${Math.round(ef.openRiskExposureETBMillions)}M`}
+              value={`AED ${Math.round(ef.openRiskExposureAEDMillions)}M`}
               tone="text-gold"
             />
           </div>
@@ -289,13 +289,13 @@ export function DossierView({
           </div>
         </Module>
 
-        {/* 5 EISAA pillar routing */}
-        <Module index={4} title="EISAA Pillar Routing" code="M-05" className="lg:col-span-7">
+        {/* 5 UAE IAA pillar routing */}
+        <Module index={4} title="UAE IAA Pillar Routing" code="M-05" className="lg:col-span-7">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="eyebrow !text-[9.5px] text-left">
-                  <th className="pb-2 font-normal">EISAA pillar / service</th>
+                  <th className="pb-2 font-normal">UAE IAA pillar / service</th>
                   <th className="pb-2 font-normal">Trigger</th>
                   <th className="pb-2 text-right font-normal">Risk exposure</th>
                   <th className="pb-2 pl-3 text-right font-normal">Conf.</th>
@@ -312,7 +312,7 @@ export function DossierView({
                       {r.triggerSignal} <SourceBadges refs={r.sourceRefs} sources={d.sources} />
                     </td>
                     <td className="num py-2.5 text-right whitespace-nowrap">
-                      {r.estimatedRiskExposureETB}
+                      {r.estimatedRiskExposureAED}
                     </td>
                     <td className="py-2.5 pl-3 text-right">
                       <span
@@ -363,7 +363,7 @@ export function DossierView({
         {/* 6 Governance radar */}
         <Module
           index={6}
-          title="INSA / Cyber & Governance Risk Radar"
+          title="TDRA / Cyber & Governance Risk Radar"
           code="M-06"
           className="lg:col-span-7"
         >
@@ -375,7 +375,7 @@ export function DossierView({
               >
                 {c.severity === "CRITICAL" ? (
                   <AlertTriangle className="mt-0.5 size-4 shrink-0 text-crimson" />
-                ) : c.category === "INSA / National Cyber Policy" ? (
+                ) : c.category === "TDRA / National Cyber Policy" ? (
                   <Landmark className="mt-0.5 size-4 shrink-0 text-azure" />
                 ) : (
                   <ShieldCheck className="mt-0.5 size-4 shrink-0 text-emerald" />
